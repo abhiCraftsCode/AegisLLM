@@ -1,0 +1,34 @@
+# Python Virtual Environment & Cache
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.cache/
+
+# Aegis Database & Local Binaries
+# (Prevents 800MB model & SQLite DB from pushing to GitHub)
+models/
+*.db
+*.sqlite3
+
+# Environment Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Machine Learning Checkpoints
+*.onnx
+*.pt
+*.bin
+*.safetensors
+*.ckpt
+
+# IDE & System Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
