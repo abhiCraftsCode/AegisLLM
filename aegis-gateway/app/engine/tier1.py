@@ -16,7 +16,7 @@ TIER1_PATTERNS = [
     (re.compile(r"<\s*im_start\s*>", re.IGNORECASE), "CHATML_TOKEN_INJECTION"),
 ]
 
-def scan_tier1(prompt: str) -> Tuple[bool, float, Optional[str]]:
+def scan_heuristics(prompt: str) -> Tuple[bool, float, Optional[str]]:
     """
     Scans a prompt against heuristic regex rules.
     Returns: (is_threat: bool, threat_score: float, pattern_name: str)

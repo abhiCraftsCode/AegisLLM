@@ -78,4 +78,4 @@ class Tier2ONNXEngine:
         return is_threat, round(threat_score, 4)
 
 # Global Engine Instance Singleton
-tier2_engine = Tier2ONNXEngine()
+onnx_engine = Tier2ONNXEngine()
