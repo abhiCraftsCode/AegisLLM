@@ -9,7 +9,6 @@ __pycache__/
 
 # Aegis Database & Local Binaries
 # (Prevents 800MB model & SQLite DB from pushing to GitHub)
-models/
 *.db
 *.sqlite3
 
