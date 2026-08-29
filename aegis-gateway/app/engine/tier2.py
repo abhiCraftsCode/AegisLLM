@@ -44,25 +44,17 @@ class Tier2ONNXEngine:
         # 1. Tokenize Input Text (Truncate to 512 max tokens)
         inputs = self.tokenizer(
             prompt,
-            padding=True,
+            padding="max_length",
             truncation=True,
             max_length=512,
-            return_token_type_ids=True,
             return_tensors="np"
         )
 
-        # 2. Build ONNX Inputs Matrix matching model graph
-        onnx_inputs = {
-            "input_ids": inputs["input_ids"].astype(np.int64),
-            "attention_mask": inputs["attention_mask"].astype(np.int64)
-        }
+        # Filter out input keys not expected by the DeBERTa ONNX graph
+        input_names = [i.name for i in self.session.get_inputs()]
+        onnx_inputs = {k: v for k, v in inputs.items() if k in input_names}
 
-        if "token_type_ids" in inputs:
-            onnx_inputs["token_type_ids"] = inputs["token_type_ids"].astype(np.int64)
-
-        # 3. Run ONNX Model Forward Pass
         outputs = self.session.run(None, onnx_inputs)
-
         # 4. Safely extract logits (Convert raw output to standard NumPy float array)
         raw_logits = np.asarray(outputs[0])
         logits = raw_logits[0] if raw_logits.ndim > 1 else raw_logits
