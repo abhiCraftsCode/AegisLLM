@@ -8,8 +8,9 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 import httpx
 
-from app.config import settings
-from app.database import engine, Base, get_db
+from app.core.config import settings
+from app.db import engine, Base, get_db
+from app.schemas import InspectRequest,InspectResponse
 from app.models import APIKey, AuditLog
 from app.middleware.auth import verify_api_key
 from app.middleware.rate_limiter import limiter
@@ -24,38 +25,22 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     yield
     print("[INFO] Aegis Gateway shutting down...")
+    await engine.dispose()
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    version=settings.VERSION,
     lifespan=lifespan
 )
 
 # CORS Middleware Setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Pydantic Request / Response Models
-class InspectRequest(BaseModel):
-    prompt: str = Field(..., min_length=1, max_length=10000, description="Text prompt to analyze for injection attacks")
-
-class InspectResponse(BaseModel):
-    is_threat: bool
-    threat_score: float
-    action: str  # "ALLOWED" or "BLOCKED"
-    tier_triggered: Optional[str] = None
-    latency_ms: float
-
-class ChatCompletionRequest(BaseModel):
-    model: str = Field(default="gpt-3.5-turbo")
-    messages: List[Dict[str, Any]]
-    temperature: Optional[float] = 0.7
-    upstream_url: Optional[str] = Field(default="https://api.openai.com/v1/chat/completions")
 
 # --- Routes ---
 
@@ -64,7 +49,6 @@ async def health_check():
     return {
         "status": "healthy",
         "service": settings.PROJECT_NAME,
-        "version": settings.VERSION,
         "onnx_model_loaded": onnx_engine.session is not None
     }
 
