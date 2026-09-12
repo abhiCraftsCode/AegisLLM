@@ -68,7 +68,7 @@ async def health_check():
         "onnx_model_loaded": onnx_engine.session is not None
     }
 
-@app.post("/v1/inspect", response_model=InspectResponse)
+@app.post("/inspect", response_model=InspectResponse)
 async def inspect_prompt(
     payload: InspectRequest,
     request: Request,
@@ -117,7 +117,7 @@ async def inspect_prompt(
         latency_ms=latency_ms
     )
 
-@app.post("/v1/chat/completions")
+@app.post("/chat/completions")
 async def proxy_chat_completion(
     payload: ChatCompletionRequest,
     request: Request,
