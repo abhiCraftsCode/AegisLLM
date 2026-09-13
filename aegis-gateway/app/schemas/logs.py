@@ -7,11 +7,10 @@ class LogSchema(BaseModel):
 
     id: int
     key_id: int | None = None
-    #hash_prompt: str #hash prompt is useless and insecure on display
     threat_score: float
     is_blocked: bool
     reason: str | None = None
-    latency: float
+    latency_ms: float
     created_at: datetime
 
 class InspectRequest(BaseModel):
@@ -23,7 +22,7 @@ class InspectResponse(BaseModel):
     is_blocked:bool
     threat_score:float
     reason:str
-    latency:float=Field(...,description="Inspection duration in milliseconds.")
+    latency_ms:float=Field(...,description="Inspection duration in milliseconds.")
 
 """
 class ChatCompletionRequest(BaseModel):

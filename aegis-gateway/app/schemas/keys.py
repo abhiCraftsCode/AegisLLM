@@ -11,7 +11,7 @@ class KeySchema(BaseModel):
   name:str|None=None
   prefix:str
   is_active:bool
-  last_used:datetime|None=None
+  last_used_at:datetime|None=None
   created_at:datetime
 
 class OneTimeSchema(BaseModel):

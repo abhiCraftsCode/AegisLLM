@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db import engine, Base
-from app.api.auth import auth_router
+from app.api.router import api_router
 
 # Lifespan context manager to auto-create DB tables on server startup
 @asynccontextmanager
@@ -32,9 +32,9 @@ app.add_middleware(
 )
 
 
-# --- Routers ---
-app.include_router(auth_router)
+# --- Router ---
+app.include_router(api_router)
 
 @app.get("/")
 def home():
-    return {"if you are seeing this, it means server is running successfully."}
+    return {"If you are seeing this, it means server is running successfully."}

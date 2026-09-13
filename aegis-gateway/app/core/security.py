@@ -1,6 +1,6 @@
 import hashlib
 from datetime import datetime,timedelta,timezone
-from typing import Any,Optional
+from typing import Any
 from jose import jwt,JWTError
 from pwdlib import PasswordHash
 from app.core.config import settings
@@ -30,11 +30,11 @@ def create_jwt_token(id: int,token_type:str='access') -> str:
     payload = {"exp": expire, "id":id, "type": token_type}
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
-def decode_jwt_token(token: str) -> Optional[dict[str, int]]:
+def decode_jwt_token(token: str) -> dict[str, Any]|None:
     """Decode and validate a JWT string against secret key."""
     try:
       payload=jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-      return payload;
+      return payload
     except JWTError:
       #invalid token must be checked in parent caller
       return None

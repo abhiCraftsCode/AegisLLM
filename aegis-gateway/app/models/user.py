@@ -11,7 +11,7 @@ class User(Base):
   name:Mapped[str]=mapped_column(String(100),nullable=False)
   email:Mapped[str]=mapped_column(String(255),unique=True,index=True,nullable=False)
   phone:Mapped[str|None]=mapped_column(String(15),unique=True,index=True,nullable=True)
-  hash_password:Mapped[str|None]=mapped_column(String(255),nullable=True)
+  password_hash:Mapped[str|None]=mapped_column(String(255),nullable=True)
   oauth_provider:Mapped[str|None]=mapped_column(String(50),nullable=True)
   oauth_id:Mapped[str|None]=mapped_column(String(255),nullable=True,index=True)
   is_active:Mapped[bool]=mapped_column(Boolean,default=True)
