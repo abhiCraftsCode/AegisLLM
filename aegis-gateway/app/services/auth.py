@@ -1,9 +1,20 @@
 from fastapi import HTTPException,status
 from sqlalchemy import or_,select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas import RegisterSchema,AuthResponse,LoginSchema,TokenSchema,ProfileSchema
+from app.schemas import (
+  RegisterSchema,
+  AuthResponse,
+  LoginSchema,
+  TokenSchema,
+  ProfileSchema
+  )
 from app.models import User
-from app.core.security import hash_password,create_jwt_token,verify_password
+from app.core.security import (
+  hash_password,
+  create_jwt_token,
+  verify_password,
+  decode_jwt_token
+  )
 
 class AuthService:
   """provides all services related to authentication"""
@@ -69,3 +80,40 @@ class AuthService:
       user=ProfileSchema.model_validate(user),
       tokens=TokenSchema(access_token=access_token,refresh_token=refresh_token)
     )
+
+  @staticmethod
+  async def refresh_tokens(db: AsyncSession, refresh_token_str: str) -> TokenSchema:
+      """Decodes refresh token and issues a fresh token pair."""
+      payload = decode_jwt_token(refresh_token_str)
+      if not payload or payload.get("type") != "refresh":
+          raise HTTPException(
+              status_code=status.HTTP_401_UNAUTHORIZED,
+              detail="Invalid or expired refresh token.",
+              headers={"WWW-Authenticate": "Bearer"},
+          )
+
+      user_id = payload.get("sub")
+      if not user_id:
+          raise HTTPException(
+              status_code=status.HTTP_401_UNAUTHORIZED,
+              detail="Malformed token claims.",
+              headers={"WWW-Authenticate": "Bearer"},
+          )
+
+      user = await db.get(User, int(user_id))
+      if not user or not user.is_active:
+          raise HTTPException(
+              status_code=status.HTTP_401_UNAUTHORIZED,
+              detail="User inactive or no longer exists.",
+          )
+
+      # Issue fresh token pair
+      new_access_token = create_jwt_token(id=user.id)
+      new_refresh_token = create_jwt_token(id=user.id)
+
+      return TokenSchema(
+          access_token=new_access_token,
+          refresh_token=new_refresh_token,
+          token_type="bearer",
+      )
+
