@@ -9,12 +9,22 @@ class UserSchema(BaseModel):
   
 class RegisterSchema(UserSchema):
   """request schema used in registration process."""
-  password:str=Field(...,min_length=8,max_length=128,description="Password for future login.")
+  password:str=Field(...,
+                    min_length=8,
+                    max_length=128,
+                    description="Password for future login.",
+                    examples=["password@123"]
+                    )
 
 class LoginSchema(BaseModel):
   """request schema used in login process."""
   identifier:str=Field(...,min_length=1,max_length=255,examples=["abc@example.com","9876543210"])
-  password:str=Field(...,min_length=8,max_length=128,description="Password for login.")
+  password:str=Field(...,
+                      min_length=8,
+                      max_length=128,
+                      description="Password for future login.",
+                      examples=["password@123"]
+                      )
 
 class OauthSchema(BaseModel):
   """request schema used in oauth login process."""

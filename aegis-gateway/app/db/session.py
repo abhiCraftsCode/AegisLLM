@@ -16,9 +16,9 @@ engine=create_async_engine(
 LocalSession=async_sessionmaker(
   bind=engine,
   class_=AsyncSession,
-  auto_commit=False,
-  auto_flush=False,
-  expire_on_commit=False
+  autocommit=False,
+  autoflush=False,
+  expire_on_commit=False,
 )
 
 #dependency helper function to connect to db

@@ -14,7 +14,7 @@ async def lifespan(app: FastAPI):
     yield
     print("[INFO] Aegis Gateway shutting down...")
     await engine.dispose()
-    
+
 # main app
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -34,3 +34,7 @@ app.add_middleware(
 
 # --- Routers ---
 app.include_router(auth_router)
+
+@app.get("/")
+def home():
+    return {"if you are seeing this, it means server is running successfully."}

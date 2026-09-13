@@ -58,7 +58,7 @@ class AuthService:
     stmt=select(User).where(or_(User.email==identifier,User.phone==identifier))
     user=(await db.execute(stmt)).scalar_one_or_none()
     # invalid identifier / oauth user but trying login by password / invalid password
-    if user is None or user.hash_password is None or verify_password(data.password,user.hash_password):
+    if user is None or user.hash_password is None or not verify_password(data.password,user.hash_password):
       raise HTTPException(detail="Invalid credentials.",status_code=status.HTTP_401_UNAUTHORIZED)
 
     # issue tokens for session management
