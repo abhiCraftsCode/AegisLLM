@@ -6,6 +6,7 @@ class Settings(BaseSettings):
   """class to configure the app settings from env file."""
 
   PROJECT_NAME:str="Aegis-gateway"
+  PROJECT_VERSION:str="1.0.0"
   THREAT_BLOCK_THRESHOLD:float=0.80
   DEFAULT_RATE_LIMIT_RPM:int=60
   ALGORITHM: str = "HS256"
@@ -19,6 +20,8 @@ class Settings(BaseSettings):
   GATEWAY_KEY:str=Field(...)
   ALLOWED_ORIGINS: List[str] = Field(...)
 
+  #env configuration can be done in 2 ways
+  #config=SettingsConfigDict(env_file=".env",extra="ignore")
   class Config:
     env_file=".env"
     extra="ignore"

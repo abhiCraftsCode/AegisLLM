@@ -4,7 +4,7 @@ from pydantic import BaseModel,EmailStr,Field,ConfigDict
 class UserSchema(BaseModel):
   """base schema for user."""
   name:str=Field(...,min_length=2,max_length=100,examples=["Shah Rukh Khan"])
-  email:EmailStr=Field(...,examples=["abc@example.com"])
+  email:EmailStr|None=Field(default=None,examples=["abc@example.com"])
   phone:str|None=Field(default=None,max_length=15,min_length=10,examples=["+919876543210","9876543210"])
   
 class RegisterSchema(UserSchema):
@@ -43,3 +43,8 @@ class TokenPayloadSchema(BaseModel):
   id:int
   token_type:str
   exp:int
+
+class AuthResponse(BaseModel):
+  """response schema for successful authentication."""
+  user:ProfileSchema
+  tokens:TokenSchema

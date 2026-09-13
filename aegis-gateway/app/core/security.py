@@ -11,7 +11,7 @@ def verify_password(plain_password:str,hashed_password:str)->bool:
   """verigy raw password against stored hash password."""
   return pwd.verify(plain_password,hashed_password)
 
-def get_password(password:str)->str:
+def hash_password(password:str)->str:
   """generate hashed password for raw passwrod."""
   return pwd.hash(password)
 

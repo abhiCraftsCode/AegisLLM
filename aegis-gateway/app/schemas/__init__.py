@@ -6,6 +6,7 @@ from app.schemas.users import (
     ProfileSchema,
     TokenSchema,
     TokenPayloadSchema,
+    AuthResponse,
 )
 from app.schemas.keys import (
     KeySchema,
@@ -27,6 +28,7 @@ __all__ = [
     "ProfileSchema",
     "TokenSchema",
     "TokenPayloadSchema",
+    "AuthResponse",
     "KeySchema",
     "GenerateResponse",
     "GenerateSchema",
