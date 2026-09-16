@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.token import TokenService
+from app.modules.token.service import TokenService
 from app.modules.auth.repository import UserRepository
 from app.models import User
 from app.db.session import get_db

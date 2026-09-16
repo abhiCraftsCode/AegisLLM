@@ -2,10 +2,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.auth.schemas import (
   RegisterSchema,
   AuthResponse,
-  LoginSchema,
-  TokenSchema,
-  ProfileSchema
+  LoginSchema
   )
+from app.modules.token.schemas import TokenSchema
+from app.modules.user.schemas import ProfileSchema
 from app.core.exceptions import (
   MissingCredentialsError,
   UserAlreadyExistsError,
@@ -14,7 +14,7 @@ from app.core.exceptions import (
 from app.models import User
 from app.core.security import hash_password,verify_password
 from app.modules.auth.repository import UserRepository
-from app.core.token import TokenService
+from app.modules.token.service import TokenService
 
 class AuthService:
   """provides all services related to authentication"""
