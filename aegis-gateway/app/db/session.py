@@ -21,6 +21,7 @@ LocalSession=async_sessionmaker(
   expire_on_commit=False,
 )
 
+
 #dependency helper function to connect to db
 async def get_db()->AsyncGenerator[AsyncSession,None]:
   """dependency for db connection."""

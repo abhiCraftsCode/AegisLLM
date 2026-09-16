@@ -5,11 +5,7 @@ class AppException(Exception):
 
 class InvalidCredentialsError(AppException):
     """Raised when authentication credentials are invalid."""
-    HTTPException(
-        detail="Invalid credentials.",
-        status_code=status.HTTP_401_UNAUTHORIZED
-        )
-
+    
 class UserAlreadyExistsError(AppException):
     """Raised when a user already exists."""
     HTTPException(

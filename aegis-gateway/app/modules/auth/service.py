@@ -14,7 +14,7 @@ from app.core.exceptions import (
 from app.models import User
 from app.core.security import hash_password,verify_password
 from app.modules.auth.repository import UserRepository
-from app.modules.auth.tokenService import TokenService
+from app.core.token import TokenService
 
 class AuthService:
   """provides all services related to authentication"""

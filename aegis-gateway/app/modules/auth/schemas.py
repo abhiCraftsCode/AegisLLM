@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel,EmailStr,Field,ConfigDict,field_validator
+from app.core.token import TokenSchema
 
 class UserSchema(BaseModel):
   """base schema for user."""
@@ -62,18 +63,6 @@ class ProfileSchema(UserSchema):
   oauth_provider:str|None=None
   is_active:bool
   created_at:datetime
-
-class TokenSchema(BaseModel):
-  """response schema for tokens"""
-  access_token:str
-  refresh_token:str
-  token_type:str="bearer"
-
-class TokenPayloadSchema(BaseModel):
-  """schema for token structure."""
-  id:int
-  type:str
-  exp:int
 
 class AuthResponse(BaseModel):
   """response schema for successful authentication."""
