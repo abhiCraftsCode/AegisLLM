@@ -1,10 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.modules.auth.schemas import (
   RegisterSchema,
   AuthResponse,
   LoginSchema
   )
-from app.modules.token.schemas import TokenSchema
 from app.modules.user.schemas import ProfileSchema
 from app.core.exceptions import (
   MissingCredentialsError,
@@ -13,7 +13,7 @@ from app.core.exceptions import (
   )
 from app.models import User
 from app.core.security import hash_password,verify_password
-from app.modules.auth.repository import UserRepository
+from app.modules.user.service import UserService
 from app.modules.token.service import TokenService
 
 class AuthService:
@@ -27,15 +27,14 @@ class AuthService:
       raise MissingCredentialsError()
 
     # check if user already exist with those credentials
-    repo=UserRepository(db)
     if data.email:
-      existing_user=await repo.get_by_email(data.email)
+      existing_user=await UserService.find_user(data.email,db)
       if existing_user is not None:
         raise UserAlreadyExistsError()
     if data.phone:
-          existing_user=await repo.get_by_phone(data.phone)
-          if existing_user is not None:
-            raise UserAlreadyExistsError()
+      existing_user=await UserService.find_user(data.phone,db)
+      if existing_user is not None:
+        raise UserAlreadyExistsError()
 
     # creating new user
     new_user=User(
@@ -46,36 +45,40 @@ class AuthService:
     )
     # inserting and commiting to database
     try:
-      new_user=await repo.create_user(new_user)
+      new_user=await UserService.create_user(new_user,db)
       await db.commit()
     except Exception:
       await db.rollback()
       raise
 
     # issue tokens for session management
-    access_token,refresh_token=TokenService.create_tokens(new_user.id)
+    tokens=TokenService.create_tokens(new_user.id)
 
     return AuthResponse(
       user=ProfileSchema.model_validate(new_user),
-      tokens=TokenSchema(access_token=access_token,refresh_token=refresh_token)
+      tokens=tokens
     )
 
   @staticmethod
   async def login_user(data:LoginSchema,db:AsyncSession)->AuthResponse:
     """login a existing user."""
 
-    #check for user availability
-    repo=UserRepository(db)
     identifier=data.identifier.strip()
-    user=await repo.get_by_identifier(identifier)
+    if len(identifier)==0:
+      raise MissingCredentialsError()
+    
+    #check for user availability
+    user=await UserService.find_user(identifier,db)
+
     # invalid identifier / oauth user but trying login by password / invalid password
+    # why not user not found and invalid is because while login it is invalid user.
     if user is None or user.password_hash is None or not verify_password(data.password,user.password_hash):
       raise InvalidCredentialsError()
 
     # issue tokens for session management
-    access_token,refresh_token=TokenService.create_tokens(user.id)
+    tokens=TokenService.create_tokens(user.id)
     return AuthResponse(
       user=ProfileSchema.model_validate(user),
-      tokens=TokenSchema(access_token=access_token,refresh_token=refresh_token)
+      tokens=tokens
     )
 

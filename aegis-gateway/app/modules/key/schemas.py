@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel,Field
+from pydantic import BaseModel,Field,ConfigDict
 
 class GenerateSchema(BaseModel):
   """request schema for generating key."""
@@ -7,6 +7,8 @@ class GenerateSchema(BaseModel):
 
 class KeySchema(BaseModel):
   """response schema for key display."""
+  model_config=ConfigDict(from_attributes=True)
+  
   id:int
   name:str|None=None
   prefix:str
@@ -14,12 +16,8 @@ class KeySchema(BaseModel):
   last_used_at:datetime|None=None
   created_at:datetime
 
-class OneTimeSchema(BaseModel):
-  """response schema to showcase key for only once after
-    being generated so that user can copy it."""
-  raw_key:str
-
 class GenerateResponse(BaseModel):
   """response to be sent at key generation."""
   key:KeySchema
-  secret:OneTimeSchema
+  # only sent once in this generation response
+  secret:str # raw key

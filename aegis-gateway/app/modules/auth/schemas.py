@@ -1,5 +1,5 @@
-from datetime import datetime
-from pydantic import BaseModel,EmailStr,Field,ConfigDict,field_validator
+from pydantic import BaseModel,EmailStr,Field
+
 from app.modules.token.schemas import TokenSchema
 from app.modules.user.schemas import UserSchema,ProfileSchema
   
@@ -14,7 +14,12 @@ class RegisterSchema(UserSchema):
 
 class LoginSchema(BaseModel):
   """request schema used in login process."""
-  identifier:str=Field(...,min_length=1,max_length=255,examples=["abc@example.com","9876543210"])
+  identifier:str=Field(...,
+                      min_length=1,
+                      max_length=255,
+                      description="Email or Phone",
+                      examples=["abc@example.com","9876543210"]
+                      )
   password:str=Field(...,
                       min_length=8,
                       max_length=128,

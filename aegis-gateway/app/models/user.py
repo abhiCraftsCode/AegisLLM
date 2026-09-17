@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Boolean,Integer,String,DateTime
 from sqlalchemy.orm import mapped_column,Mapped
+
 from app.db.base import Base,utc_now
 
 class User(Base):

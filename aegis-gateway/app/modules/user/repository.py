@@ -1,9 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import or_,select
+
 from app.models.user import User
 
 class UserRepository:
-  """repository for user table"""
+  """repository for users table"""
   def __init__(self, db: AsyncSession):
         self.db = db
 
@@ -27,7 +28,7 @@ class UserRepository:
         stmt=select(User).where(User.id==user_id)
         return (await self.db.execute(stmt)).scalar_one_or_none()
 
-  async def create_user(self,user:User)->User:
+  async def create(self,user:User)->User:
       """add new user row"""
       self.db.add(user)
       await self.db.flush()
