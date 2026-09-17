@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import hash_str
 from app.core.exceptions import UnauthorizedKeyError,KeyNotFoundError
 from app.modules.key.repository import KeyRepository
-from app.models.apiKey import ApiKey
+from app.models import ApiKey
 from app.modules.key.schemas import (
   KeySchema,
   GenerateResponse,

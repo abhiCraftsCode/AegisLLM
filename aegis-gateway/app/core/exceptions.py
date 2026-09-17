@@ -19,6 +19,12 @@ class KeyNotFoundError(AppException):
 class UnauthorizedKeyError(AppException):
     """Raised when a api key does not belong to current user."""
 
+class LogNotFoundError(AppException):
+    """Raised when the api key was not found in db."""
+
+class UnauthorizedLogError(AppException):
+    """Raised when a api key does not belong to current user."""
+
 class MissingTokenError(AppException):
     """Raised when the token is missing."""
 

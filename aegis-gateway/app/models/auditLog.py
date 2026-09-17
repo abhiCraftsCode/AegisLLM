@@ -1,5 +1,6 @@
 from datetime import datetime
-from sqlalchemy import Boolean,Integer,String,DateTime,ForeignKey,Float
+from uuid import UUID,uuid4
+from sqlalchemy import Boolean,Integer,String,DateTime,ForeignKey,Float,Uuid
 from sqlalchemy.orm import mapped_column,Mapped
 
 from app.db.base import Base,utc_now
@@ -9,7 +10,7 @@ class AuditLog(Base):
 
   id:Mapped[int]=mapped_column(Integer,primary_key=True,index=True,autoincrement=True)
 
-  prompt_hash:Mapped[str]=mapped_column(String(64),nullable=False,index=True)
+  request_id:Mapped[UUID]=mapped_column(Uuid,default=uuid4,unique=True)
   threat_score:Mapped[float]=mapped_column(Float,nullable=False)
   is_blocked:Mapped[bool]=mapped_column(Boolean,default=False,index=True)
   reason:Mapped[str|None]=mapped_column(String(100),nullable=True)

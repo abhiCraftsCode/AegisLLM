@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.user.repository import UserRepository
 from app.modules.user.schemas import ProfileSchema
-from app.models.user import User
+from app.models import User
 from app.core.exceptions import UserNotFoundError
 
 class UserService:

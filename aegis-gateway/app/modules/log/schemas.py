@@ -1,11 +1,13 @@
 from datetime import datetime
-from pydantic import BaseModel,Field,ConfigDict
+from uuid import UUID
+from pydantic import BaseModel,ConfigDict
 
 class LogSchema(BaseModel):
     """response schema for audit logs."""
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    request_id:UUID
     key_id: int | None = None
     threat_score: float
     is_blocked: bool
@@ -13,16 +15,17 @@ class LogSchema(BaseModel):
     latency_ms: float
     created_at: datetime
 
-class InspectRequest(BaseModel):
-    """request schema for prompt inspection."""
-    prompt:str=Field(...,min_length=1,description="Raw input text for LLM.")
+# class InspectRequest(BaseModel):
+#     """request schema for prompt inspection."""
+#     prompt:str=Field(...,min_length=1,description="Raw input text for LLM.")
 
-class InspectResponse(BaseModel):
-    """response schema for prompt inspection."""
-    is_blocked:bool
-    threat_score:float
-    reason:str
-    latency_ms:float=Field(...,description="Inspection duration in milliseconds.")
+# class InspectResponse(BaseModel):
+#     """response schema for prompt inspection."""
+#     request_id:UUID
+#     is_blocked:bool
+#     threat_score:float
+#     reason:str
+#     latency_ms:float
 
 """
 class ChatCompletionRequest(BaseModel):

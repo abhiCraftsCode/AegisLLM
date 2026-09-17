@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select,delete
 
-from app.models.apiKey import ApiKey
+from app.models import ApiKey
 
 class KeyRepository:
   """repository for api_keys table"""

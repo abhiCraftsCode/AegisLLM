@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import or_,select
 
-from app.models.user import User
+from app.models import User
 
 class UserRepository:
   """repository for users table"""
