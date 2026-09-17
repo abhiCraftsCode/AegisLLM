@@ -33,6 +33,3 @@ class KeyRepository:
   async def deactivate(self,key:ApiKey)->None:
     """revokes the active status of the key and marks it inactive permanently"""
     key.is_active=False
-
-
-    

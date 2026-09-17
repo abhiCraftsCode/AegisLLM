@@ -2,13 +2,19 @@ import secrets
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_str
-from app.core.exceptions import UnauthorizedKeyError,KeyNotFoundError
+from app.core.exceptions import (
+  UnauthorizedKeyError,
+  KeyNotFoundError,
+  MissingLLMError
+)
 from app.modules.key.repository import KeyRepository
 from app.models import ApiKey
 from app.modules.key.schemas import (
   KeySchema,
   GenerateResponse,
-  GenerateSchema
+  GenerateSchema,
+  UpstreamConfig,
+  ConfigResponse
 )
 
 class KeyService:
@@ -21,18 +27,22 @@ class KeyService:
 
     #generate a new secret key
     raw_key=f"aegis_{secrets.token_urlsafe(32)}"
-    #encrypt the key 
-    hash_key=hash_str(raw_key)
-    prefix=f"{raw_key[:10]}..."
+    
     new_key=ApiKey(
-      prefix=prefix,
+      prefix=f"{raw_key[:10]}...",
       name=data.name,
-      key_hash=hash_key,
-      user_id=user_id
+      key_hash=hash_str(raw_key), # encrypted key
+      user_id=user_id,
+      llm_name=data.llm_name,
+      llm_url=data.llm_url,
+      llm_auth=data.llm_auth
     )
-
-    new_key=await repo.create(new_key)
-    await db.commit()
+    try:
+      new_key=await repo.create(new_key)
+      await db.commit()
+    except Exception:
+      await db.rollback()
+      raise
 
     # structure the response for one time key showing
     key=GenerateResponse(
@@ -54,8 +64,12 @@ class KeyService:
     if key.user_id != user_id:
       raise UnauthorizedKeyError()
 
-    await repo.deactivate(key)  
-    await db.commit()
+    try:
+      await repo.deactivate(key)  
+      await db.commit()
+    except Exception:
+      await db.rollback()
+      raise
     #return none because success deletion code will be returned 
 
   @staticmethod
@@ -89,3 +103,47 @@ class KeyService:
       raise KeyNotFoundError()
     
     return KeySchema.model_validate(key)
+
+  @staticmethod
+  async def update(
+    key_id:int,
+    user_id:int,
+    data:UpstreamConfig,
+    db:AsyncSession
+    )->KeySchema:
+    """update the fields of row"""
+    repo=KeyRepository(db)
+    key=await repo.get_by_id(key_id)
+
+    if key is None:
+      raise KeyNotFoundError()
+
+    if key.user_id!=user_id:
+      raise UnauthorizedKeyError()
+
+    try:
+      key.llm_auth=data.llm_auth
+      key.llm_url=data.llm_url
+      key.llm_name=data.llm_name
+      await db.commit()
+      await db.refresh(key)
+    except Exception:
+      await db.rollback()
+      raise
+
+    return KeySchema.model_validate(key)
+
+  @staticmethod
+  async def get_llm_config(key_id,db:AsyncSession)->ConfigResponse:
+    """fetches llm  configuration of a key"""
+    repo=KeyRepository(db)
+    key=await repo.get_by_id(key_id)
+    if key is None or key.llm_url is None or key.llm_auth is None:
+      raise MissingLLMError()
+
+    return ConfigResponse(
+      llm_auth=key.llm_auth,
+      llm_url=key.llm_url
+    )
+
+  

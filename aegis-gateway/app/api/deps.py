@@ -1,6 +1,7 @@
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
+from collections.abc import AsyncGenerator
 
 from app.core.security import hash_str
 from app.modules.token.service import TokenService
@@ -8,7 +9,8 @@ from app.modules.user.service import UserService
 from app.modules.key.service import KeyService
 from app.modules.user.schemas import ProfileSchema
 from app.modules.key.schemas import KeySchema
-from app.db.session import get_db
+from app.db.session import LocalSession
+from app.core.engine import SecurityEngine
 from app.core.exceptions import (
     MissingTokenError,
     AccessTokenError,
@@ -16,6 +18,19 @@ from app.core.exceptions import (
     )
 
 bearer_scheme = HTTPBearer()
+
+#dependency helper function to connect to db
+async def get_db()->AsyncGenerator[AsyncSession,None]:
+  """dependency for db connection."""
+  async with LocalSession() as session:
+    try:
+      yield session
+    finally:
+      await session.close()
+
+#dependency function to get search engine
+def get_engine()->SecurityEngine:
+    raise NotImplementedError
 
 # dependency function to mimic isAuth for jwt
 async def get_current_user(
@@ -45,7 +60,7 @@ async def get_current_user(
 async def get_current_api_key(
     credentials:HTTPAuthorizationCredentials=Depends(bearer_scheme),
     db:AsyncSession=Depends(get_db)
-):
+)->KeySchema:
     """authenticate an aegis API key"""
 
     raw_key=credentials.credentials

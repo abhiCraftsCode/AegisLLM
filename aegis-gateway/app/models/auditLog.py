@@ -14,6 +14,8 @@ class AuditLog(Base):
   threat_score:Mapped[float]=mapped_column(Float,nullable=False)
   is_blocked:Mapped[bool]=mapped_column(Boolean,default=False,index=True)
   reason:Mapped[str|None]=mapped_column(String(100),nullable=True)
+  llm_url:Mapped[str|None]=mapped_column(String(500),nullable=True)
+  llm_name:Mapped[str|None]=mapped_column(String(100),nullable=True)
   latency_ms:Mapped[float]=mapped_column(Float)
   created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=utc_now,index=True)
 

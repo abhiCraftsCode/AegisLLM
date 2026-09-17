@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Boolean,Integer,String,DateTime,ForeignKey
+from sqlalchemy import Boolean,Integer,String,DateTime,ForeignKey,Text
 from sqlalchemy.orm import mapped_column,Mapped
 
 from app.db.base import Base,utc_now
@@ -14,6 +14,9 @@ class ApiKey(Base):
   key_hash:Mapped[str]=mapped_column(String(64),nullable=False,unique=True,index=True)
   is_active:Mapped[bool]=mapped_column(Boolean,default=True)
   last_used_at:Mapped[datetime|None]=mapped_column(DateTime(timezone=True),nullable=True)
+  llm_url:Mapped[str|None]=mapped_column(String(500),nullable=True)
+  llm_name:Mapped[str|None]=mapped_column(String(100),nullable=True)
+  llm_auth:Mapped[str|None]=mapped_column(Text,nullable=True)
   created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=utc_now)
 
   user_id:Mapped[int]=mapped_column(

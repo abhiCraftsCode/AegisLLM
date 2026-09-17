@@ -9,17 +9,24 @@ class UserService:
   """provide all services related to user data."""
 
   @staticmethod
-  async def create_user(user:User,db:AsyncSession):
+  async def create_user(user:User,db:AsyncSession)->ProfileSchema:
     """create a new user row."""
     repo=UserRepository(db)
-    user=await repo.create(user)
-    return user
+    try:
+      user=await repo.create(user)
+      await db.commit()
+    except Exception:
+      await db.rollback()
+      raise
+
+    return ProfileSchema.model_validate(user)
 
   @staticmethod
   async def find_user(identifier,db)->User|None:
     """find a user row else none"""
     repo=UserRepository(db)
     # allowed returning none because some function may require user not to be available
+    # returning model instead of schema to match password
     return await repo.get_by_identifier(identifier)
     
   @staticmethod

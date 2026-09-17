@@ -1,4 +1,3 @@
-from collections.abc import AsyncGenerator
 from sqlalchemy.ext.asyncio import async_sessionmaker,AsyncSession,create_async_engine
 
 from app.core.config import settings
@@ -23,11 +22,3 @@ LocalSession=async_sessionmaker(
 )
 
 
-#dependency helper function to connect to db
-async def get_db()->AsyncGenerator[AsyncSession,None]:
-  """dependency for db connection."""
-  async with LocalSession() as session:
-    try:
-      yield session
-    finally:
-      await session.close()

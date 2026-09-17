@@ -11,18 +11,13 @@ class LogService:
   @staticmethod
   async def create_log(log:AuditLog,db:AsyncSession)->LogSchema:
     """create a new log row"""
-    # audit_log = AuditLog(
-    #         request_id=data.request_id,
-    #         user_id=data.user_id,
-    #         api_key_id=data.api_key_id,
-    #         threat_score=data.threat_score,
-    #         is_blocked=data.is_blocked,
-    #         reason=data.reason,
-    #         latency=data.latency
-    #     )
     repo=LogRepository(db)
-    log=await repo.create(log)
-    await db.commit()
+    try:
+      log=await repo.create(log)
+      await db.commit()
+    except Exception:
+      await db.rollback()
+      raise
     return LogSchema.model_validate(log)
 
   @staticmethod

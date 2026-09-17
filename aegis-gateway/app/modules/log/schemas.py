@@ -14,3 +14,5 @@ class LogSchema(BaseModel):
     reason: str | None = None
     latency_ms: float
     created_at: datetime
+    llm_name:str|None=None
+    llm_url:str|None=None

@@ -43,19 +43,14 @@ class AuthService:
       phone=data.phone,
       password_hash=hash_password(data.password)
     )
-    # inserting and commiting to database
-    try:
-      new_user=await UserService.create_user(new_user,db)
-      await db.commit()
-    except Exception:
-      await db.rollback()
-      raise
+
+    new_user=await UserService.create_user(new_user,db)
 
     # issue tokens for session management
     tokens=TokenService.create_tokens(new_user.id)
 
     return AuthResponse(
-      user=ProfileSchema.model_validate(new_user),
+      user=new_user,
       tokens=tokens
     )
 
@@ -72,7 +67,11 @@ class AuthService:
 
     # invalid identifier / oauth user but trying login by password / invalid password
     # why not user not found and invalid is because while login it is invalid user.
-    if user is None or user.password_hash is None or not verify_password(data.password,user.password_hash):
+    if (
+      user is None 
+      or user.password_hash is None 
+      or not verify_password(data.password,user.password_hash)
+    ):
       raise InvalidCredentialsError()
 
     # issue tokens for session management
