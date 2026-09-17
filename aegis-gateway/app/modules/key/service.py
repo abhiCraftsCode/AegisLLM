@@ -66,7 +66,7 @@ class KeyService:
     return [KeySchema.model_validate(key) for key in keys]
 
   @staticmethod
-  async def get_key(key_id,user_id:int,db:AsyncSession)->KeySchema:
+  async def get_key(key_id:int,user_id:int,db:AsyncSession)->KeySchema:
     """fetch a particular key of user"""
     repo=KeyRepository(db)
     key=await repo.get_by_id(key_id)
@@ -77,4 +77,15 @@ class KeyService:
     if key.user_id != user_id:
       raise UnauthorizedKeyError()
 
+    return KeySchema.model_validate(key)
+
+  @staticmethod
+  async def get_hash_key(hash:str,db:AsyncSession)->KeySchema:
+    """fetch key with particular hash value"""
+    repo=KeyRepository(db)
+    key=await repo.get_by_hash(hash)
+    
+    if key is None:
+      raise KeyNotFoundError()
+    
     return KeySchema.model_validate(key)

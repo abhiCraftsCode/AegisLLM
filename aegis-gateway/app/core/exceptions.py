@@ -19,6 +19,9 @@ class KeyNotFoundError(AppException):
 class UnauthorizedKeyError(AppException):
     """Raised when a api key does not belong to current user."""
 
+class InactiveKeyError(AppException):
+    """raised when api key used to inspect is inactive."""
+
 class LogNotFoundError(AppException):
     """Raised when the api key was not found in db."""
 

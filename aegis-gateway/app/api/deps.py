@@ -2,21 +2,28 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import hash_str
 from app.modules.token.service import TokenService
 from app.modules.user.service import UserService
+from app.modules.key.service import KeyService
 from app.modules.user.schemas import ProfileSchema
+from app.modules.key.schemas import KeySchema
 from app.db.session import get_db
-from app.core.exceptions import MissingTokenError,AccessTokenError
+from app.core.exceptions import (
+    MissingTokenError,
+    AccessTokenError,
+    InactiveKeyError
+    )
 
 bearer_scheme = HTTPBearer()
 
-#dependency helper function to implement isAuth
+# dependency function to mimic isAuth for jwt
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_db),
 ) -> ProfileSchema:
     """dependency for is_auth, fetches the profile of logged in user."""
-
+    """authenticate the logged in user"""
     token = credentials.credentials
 
     # chechk if token decodesuccessfully
@@ -33,3 +40,20 @@ async def get_current_user(
     user = await UserService.get_profile(user_id,db)
 
     return user
+
+#dependency function to mimic is_auth for api key
+async def get_current_api_key(
+    credentials:HTTPAuthorizationCredentials=Depends(bearer_scheme),
+    db:AsyncSession=Depends(get_db)
+):
+    """authenticate an aegis API key"""
+
+    raw_key=credentials.credentials
+    hash_key=hash_str(raw_key)
+
+    key=await KeyService.get_hash_key(hash_key,db)
+
+    if not key.is_active:
+        raise InactiveKeyError()
+
+    return key
