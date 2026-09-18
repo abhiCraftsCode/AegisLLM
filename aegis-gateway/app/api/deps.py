@@ -14,7 +14,8 @@ from app.core.engine import SecurityEngine
 from app.core.exceptions import (
     MissingTokenError,
     AccessTokenError,
-    InactiveKeyError
+    InactiveKeyError,
+    InvalidKeyError
     )
 
 bearer_scheme = HTTPBearer()
@@ -64,6 +65,10 @@ async def get_current_api_key(
     """authenticate an aegis API key"""
 
     raw_key=credentials.credentials
+
+    if raw_key is None or len(raw_key)==0:
+        raise InvalidKeyError()
+    
     hash_key=hash_str(raw_key)
 
     key=await KeyService.get_hash_key(hash_key,db)

@@ -5,7 +5,7 @@ from app.core.security import hash_str
 from app.core.exceptions import (
   UnauthorizedKeyError,
   KeyNotFoundError,
-  MissingLLMError
+  LLMCredentialsError
 )
 from app.modules.key.repository import KeyRepository
 from app.models import ApiKey
@@ -139,7 +139,7 @@ class KeyService:
     repo=KeyRepository(db)
     key=await repo.get_by_id(key_id)
     if key is None or key.llm_url is None or key.llm_auth is None:
-      raise MissingLLMError()
+      raise LLMCredentialsError()
 
     return ConfigResponse(
       llm_auth=key.llm_auth,
