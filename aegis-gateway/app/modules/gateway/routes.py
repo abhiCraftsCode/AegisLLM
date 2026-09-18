@@ -14,7 +14,7 @@ from app.modules.gateway.service import GatewayService
 
 gateway_router=APIRouter(prefix="/chat",tags=["Gateway"])
 
-@gateway_router.post("/inspect",response_model=InspectResponse,status_code=status.HTTP_200_OK)
+@gateway_router.post("/inspections",response_model=InspectResponse,status_code=status.HTTP_200_OK)
 async def inspect(
   data:InspectRequest,
   key:KeySchema=Depends(get_current_api_key),

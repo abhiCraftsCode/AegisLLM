@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy import Boolean,Integer,String,DateTime,ForeignKey,Text
 from sqlalchemy.orm import mapped_column,Mapped
 
-from app.db.base import Base,utc_now
+from app.db import Base,utc_now
 
 class ApiKey(Base):
   __tablename__="api_keys"

@@ -9,7 +9,7 @@ from app.modules.user.service import UserService
 from app.modules.key.service import KeyService
 from app.modules.user.schemas import ProfileSchema
 from app.modules.key.schemas import KeySchema
-from app.db.session import LocalSession
+from app.db import LocalSession
 from app.core.engine import SecurityEngine
 from app.core.exceptions import (
     MissingTokenError,

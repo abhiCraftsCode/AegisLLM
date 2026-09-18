@@ -76,6 +76,22 @@ class LLMCredentialsError(AppException):
     status_code = 400
     detail = "LLM configuration is missing from this API key."
 
+# --- DateTime Filter Exceptions ---
+class TimeCredentialsError(AppException):
+    status_code=400
+    detail="Year or Month value is missing."
+
+class InvalidMonthError(AppException):
+    status_code=401
+    detail="Invalid Month entered."
+
+class RangeCredentialsError(AppException):
+    status_code=400
+    detail="From or To date is missing."
+
+class InvalidRangeError(AppException):
+    status_code=401
+    detail="Invalid date period."
 
 # --- Universal Clean Handler ---
 async def exception_handler(request: Request, exc: AppException) -> JSONResponse:

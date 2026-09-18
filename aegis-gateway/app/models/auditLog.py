@@ -3,7 +3,7 @@ from uuid import UUID,uuid4
 from sqlalchemy import Boolean,Integer,String,DateTime,ForeignKey,Float,Uuid
 from sqlalchemy.orm import mapped_column,Mapped
 
-from app.db.base import Base,utc_now
+from app.db import Base,utc_now
 
 class AuditLog(Base):
   __tablename__="audit_logs"
