@@ -76,6 +76,10 @@ class LLMCredentialsError(AppException):
     status_code = 400
     detail = "LLM configuration is missing from this API key."
 
+# --- Onnx Model Exceptions ---
+class ModelNotFoundError(AppException):
+    status_code = 503
+    detail = "Service Down. Search Engine Failure."
 
 # --- Universal Clean Handler ---
 async def exception_handler(request: Request, exc: AppException) -> JSONResponse:

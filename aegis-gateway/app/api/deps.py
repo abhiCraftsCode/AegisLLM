@@ -10,7 +10,7 @@ from app.modules.key.service import KeyService
 from app.modules.user.schemas import ProfileSchema
 from app.modules.key.schemas import KeySchema
 from app.db.session import LocalSession
-from app.core.engine import SecurityEngine
+from app.core.engine import SecurityEngine,AegisEngine
 from app.core.exceptions import (
     MissingTokenError,
     AccessTokenError,
@@ -31,7 +31,8 @@ async def get_db()->AsyncGenerator[AsyncSession,None]:
 
 #dependency function to get search engine
 def get_engine()->SecurityEngine:
-    raise NotImplementedError
+    """dependency for engine prerequisite loading"""
+    return AegisEngine()
 
 # dependency function to mimic isAuth for jwt
 async def get_current_user(
