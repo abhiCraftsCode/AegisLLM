@@ -1,4 +1,5 @@
 import secrets
+import math
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_str
@@ -11,6 +12,7 @@ from app.modules.key.repository import KeyRepository
 from app.models import ApiKey
 from app.modules.key.schemas import (
   KeySchema,
+  PageResponse,
   GenerateResponse,
   GenerateSchema,
   UpstreamConfig,
@@ -73,11 +75,18 @@ class KeyService:
     #return none because success deletion code will be returned 
 
   @staticmethod
-  async def get_all_keys(user_id:int,db:AsyncSession)->list[KeySchema]:
+  async def get_all_keys(user_id:int,page:int,size:int,db:AsyncSession)->PageResponse[KeySchema]:
     """fetch all the keys of user"""
     repo=KeyRepository(db)
-    keys=await repo.get_all_for_user(user_id)
-    return [KeySchema.model_validate(key) for key in keys]
+    keys,total=await repo.get_all_for_user(user_id,page,size)
+    pages=math.ceil(total/size)
+    return PageResponse(
+      items=[KeySchema.model_validate(key) for key in keys],
+      pages=pages,
+      total=total,
+      page=page,
+      size=size
+    )
 
   @staticmethod
   async def get_key(key_id:int,user_id:int,db:AsyncSession)->KeySchema:

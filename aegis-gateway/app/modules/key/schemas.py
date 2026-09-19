@@ -13,7 +13,7 @@ class GenerateSchema(BaseModel):
     )
 
 class KeySchema(BaseModel):
-  """response schema for key display."""
+  """response schema for key."""
   model_config=ConfigDict(from_attributes=True)
   
   id:int
@@ -49,3 +49,11 @@ class ConfigResponse(BaseModel):
   """response schema for updated credentials"""
   llm_url:str
   llm_auth:str
+
+class PageResponse(BaseModel):
+  """resonse schema for keys page-wise to display."""
+  items:list[KeySchema]
+  page:int
+  size:int
+  total:int
+  pages:int

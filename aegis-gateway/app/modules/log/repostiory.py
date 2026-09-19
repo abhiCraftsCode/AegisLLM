@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select,func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import AuditLog
@@ -20,11 +20,18 @@ class LogRepository:
     res=await self.db.execute(select(AuditLog).where(AuditLog.id==id))
     return res.scalar_one_or_none()
 
-  async def get_all_for_user(self,user_id:int)->list[AuditLog]:
+  async def get_all_for_user(self,user_id:int,page:int,size:int)->tuple[list[AuditLog],int]:
     """fetch all logs of user"""
-    res=await self.db.execute(
+    offset=(page-1)*size
+    logs=(await self.db.execute(
       select(AuditLog)
       .where(AuditLog.user_id==user_id)
       .order_by(AuditLog.created_at.desc())
-      )
-    return list(res.scalars().all())
+      .offset(offset)
+      .limit(size)
+    )).scalars().all()
+    total=(await self.db.execute(
+      select(func.count(AuditLog.id))
+      .where(AuditLog.user_id==user_id)
+    )).scalar_one()
+    return (list(logs),total)

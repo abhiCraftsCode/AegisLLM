@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends,status
+from fastapi import APIRouter,Depends,status,Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import User
@@ -9,6 +9,7 @@ from app.modules.key.schemas import (
   GenerateResponse,
   GenerateSchema,
   KeySchema,
+  PageResponse,
   UpstreamConfig
 )
 
@@ -46,10 +47,15 @@ async def deactivate(
   """request to deactivate key"""
   await KeyService.deactivate_key(key_id,user.id,db)
 
-@key_router.get("/all",response_model=list[KeySchema],status_code=status.HTTP_200_OK)
-async def get_all_keys(user:User=Depends(get_current_user),db:AsyncSession=Depends(get_db)):
+@key_router.get("/all",response_model=PageResponse[KeySchema],status_code=status.HTTP_200_OK)
+async def get_all_keys(
+  page:int=Query(default=1,ge=1),
+  size:int=Query(default=20,ge=1,le=100),
+  user:User=Depends(get_current_user),
+  db:AsyncSession=Depends(get_db)
+  ):
   """request for all the keys of user"""
-  return await KeyService.get_all_keys(user.id,db)
+  return await KeyService.get_all_keys(user.id,page,size,db)
 
 @key_router.get("/{key_id}",response_model=KeySchema,status_code=status.HTTP_200_OK)
 async def get_key(key_id:int,user:User=Depends(get_current_user),db:AsyncSession=Depends(get_db)):

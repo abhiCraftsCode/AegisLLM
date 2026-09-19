@@ -1,8 +1,9 @@
+import math
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import AuditLog
 from app.modules.log.repostiory import LogRepository
-from app.modules.log.schemas import LogSchema
+from app.modules.log.schemas import LogSchema,PageResponse
 from app.core.exceptions import UnauthorizedUserError,LogNotFoundError
 
 class LogService:
@@ -21,11 +22,19 @@ class LogService:
     return LogSchema.model_validate(log)
 
   @staticmethod
-  async def get_all_logs(user_id:int,db:AsyncSession)->list[LogSchema]:
+  async def get_all_logs(user_id:int,page:int,size:int,db:AsyncSession)->PageResponse[LogSchema]:
     """fetch all the logs of user"""
+    """pagination result fromation"""
     repo=LogRepository(db)
-    logs=await repo.get_all_for_user(user_id)
-    return [LogSchema.model_validate(log) for log in logs]
+    logs,total=await repo.get_all_for_user(user_id,page,size)
+    pages=math.ceil(total/size)
+    return PageResponse(
+      items=[LogSchema.model_validate(log) for log in logs],
+      size=size,
+      page=page,
+      pages=pages,
+      total=total
+    )
 
   @staticmethod
   async def get_log(log_id:int,user_id:int,db:AsyncSession)->LogSchema:

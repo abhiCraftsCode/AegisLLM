@@ -16,3 +16,11 @@ class LogSchema(BaseModel):
     created_at: datetime
     llm_name:str|None=None
     llm_url:str|None=None
+
+class PageResponse(BaseModel):
+  """resonse schema for audit-logs page-wise to display."""
+  items:list[LogSchema]
+  page:int
+  size:int
+  total:int
+  pages:int

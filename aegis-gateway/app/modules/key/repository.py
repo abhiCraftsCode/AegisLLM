@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select,delete
+from sqlalchemy import select,func
 
 from app.models import ApiKey
 
@@ -18,10 +18,21 @@ class KeyRepository:
     stmt=select(ApiKey).where(ApiKey.key_hash==hash)
     return (await self.db.execute(stmt)).scalar_one_or_none()
 
-  async def get_all_for_user(self,user_id:int)->list[ApiKey]:
+  async def get_all_for_user(self,user_id:int,page:int,size:int)->tuple[list[ApiKey],int]:
     """fetch all key rows that belong to the user with this user_id"""
-    stmt=select(ApiKey).where(ApiKey.user_id==user_id).order_by(ApiKey.created_at.desc())
-    return list((await self.db.execute(stmt)).scalars().all())
+    """pagination applied"""
+    offset=(page-1)*size
+    stmt=(
+      select(ApiKey)
+      .where(ApiKey.user_id==user_id)
+      .order_by(ApiKey.created_at.desc())
+      .offset(offset)
+      .limit(size)
+    )
+    ctstmt=select(func.count(ApiKey.id)).where(ApiKey.user_id==user_id)
+    keys=list((await self.db.execute(stmt)).scalars().all())
+    total=(await self.db.execute(ctstmt)).scalar_one()
+    return (keys,total)
 
   async def create(self,key:ApiKey)->ApiKey:
     """creae a new row in api_keys table."""
