@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends,status
+from fastapi import APIRouter,Depends,status,BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
@@ -25,8 +25,8 @@ async def register_user(data:RegisterSchema,db:AsyncSession=Depends(get_db)):
   return await AuthService.register_user(data,db)
 
 @auth_router.post("/forgot-password",response_model=None,status_code=status.HTTP_204_NO_CONTENT)
-async def forgot(data:ForgotSchema,db:AsyncSession=Depends(get_db)):
-  await AuthService.forgot_request(data,db)
+async def forgot(data:ForgotSchema,bgt:BackgroundTasks,db:AsyncSession=Depends(get_db)):
+  await AuthService.forgot_request(data,bgt,db)
 
 @auth_router.post("/reset-password",response_model=None,status_code=status.HTTP_204_NO_CONTENT)
 async def reset(data:ResetSchema,db:AsyncSession=Depends(get_db)):

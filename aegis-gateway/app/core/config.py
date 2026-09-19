@@ -1,5 +1,5 @@
 from typing import List
-from pydantic import Field
+from pydantic import Field,SecretStr
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -14,12 +14,25 @@ class Settings(BaseSettings):
   REFRESH_TOKEN_EXPIRE_DAYS: int = 2
   RESET_TOKEN_EXPIRE_MINUTES:int = 15
 
+  #mail service #mandatory
+  MAIL_USERNAME:str = Field(...)
+  MAIL_PASSWORD:SecretStr= Field(...) 
+  MAIL_FROM:str = Field(...)
+  MAIL_PORT:int = 587
+  MAIL_SERVER:str = Field(...)
+  MAIL_FROM_NAME:str="AegisLLM"
+  MAIL_STARTTLS:bool = True
+  MAIL_SSL_TLS:bool = False
+  USE_CREDENTIALS:bool = True
+  VALIDATE_CERTS:bool = True
+
   # mandatories
   DATABASE_URL:str=Field(...)
   MODEL_PATH:str=Field(...)
   SECRET_KEY:str=Field(...)
   GATEWAY_KEY:str=Field(...)
   ALLOWED_ORIGINS: List[str] = Field(...)
+  FRONTEND_URL:str=Field(...)
 
   #env configuration can be done in 2 ways
   #config=SettingsConfigDict(env_file=".env",extra="ignore")

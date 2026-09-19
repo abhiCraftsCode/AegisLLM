@@ -1,3 +1,4 @@
+from fastapi import BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.auth.schemas import (
@@ -16,6 +17,7 @@ from app.core.exceptions import (
   InvalidExpiredTokenError
   )
 from app.models import User
+from app.core.mail import send_mail
 from app.core.security import hash_password,verify_password
 from app.modules.user.service import UserService
 from app.modules.token.service import TokenService
@@ -24,13 +26,15 @@ class AuthService:
   """provides all services related to authentication"""
 
   @staticmethod
-  async def forgot_request(data:ForgotSchema,db:AsyncSession)->None:
+  async def forgot_request(data:ForgotSchema,bgt:BackgroundTasks,db:AsyncSession)->None:
     """generate and trigger a password reset link"""
     #only email based recovery now 
     user=await UserService.get_user(data.email,db)
     if not user or not user.is_active:
       return #safety measure to fool attack and hide credential mismatch info
     #dispatch email using email 
+    token=TokenService.reset_token(data.email)
+    bgt.add_task(send_mail,data.email,token)
 
   @staticmethod
   async def reset_request(data:ResetSchema,db:AsyncSession)->None:
@@ -44,6 +48,10 @@ class AuthService:
     user=await UserService.find_user(email,db)
     if not user or not user.is_active:
       raise UnauthorizedUserError()
+    if user.updated_at is not None:
+      time=int(user.updated_at.timestamp())
+      if time>payload.iat:
+        raise InvalidExpiredTokenError()
     try:
       user.password_hash=hash_password(data.new_password)
       await db.commit()

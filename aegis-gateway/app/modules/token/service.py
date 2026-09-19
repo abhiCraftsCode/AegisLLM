@@ -26,3 +26,5 @@ class TokenService:
     """generate a very short lived token."""
     token=create_jwt_token(email,token_type="reset")
     return token
+
+  

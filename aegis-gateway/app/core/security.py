@@ -23,15 +23,15 @@ def hash_str(raw_str: str) -> str:
 
 def create_jwt_token(data:int|str,token_type:str='access') -> str:
     """Issue JWT Tokens."""
-    expire=''
+    now,expire=utc_now(),''
     if token_type == "refresh":
-      expire=utc_now() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+      expire=now + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     elif token_type=="reset":
-      expire= utc_now()+timedelta(minutes=settings.RESET_TOKEN_EXPIRE_MINUTES)
+      expire=now+timedelta(minutes=settings.RESET_TOKEN_EXPIRE_MINUTES)
     else:
-      expire = utc_now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+      expire =now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    payload = {"exp": expire, "data":id, "type": token_type}
+    payload = {"iat":now,"exp": expire, "data":id, "type": token_type}
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 def decode_jwt_token(token: str) -> dict[str, Any]|None:
@@ -39,6 +39,6 @@ def decode_jwt_token(token: str) -> dict[str, Any]|None:
     try:
       payload=jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
       return payload
-    except JWTError:
+    except (JWTError,ValueError):
       #invalid token must be checked in parent caller
       return None

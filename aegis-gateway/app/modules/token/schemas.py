@@ -12,7 +12,8 @@ class TokenPayloadSchema(BaseModel):
   
   data:int|str
   type:str
-  exp:int  
+  exp:int
+  iat:int
 
 
   
