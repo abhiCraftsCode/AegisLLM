@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import AuditLog
 from app.modules.log.repostiory import LogRepository
 from app.modules.log.schemas import LogSchema
-from app.core.exceptions import UnauthorizedLogError,LogNotFoundError
+from app.core.exceptions import UnauthorizedUserError,LogNotFoundError
 
 class LogService:
   """provide all services for audit-logs"""
@@ -35,5 +35,5 @@ class LogService:
     if log is None:
       raise LogNotFoundError()
     if log.user_id!=user_id:
-      raise UnauthorizedLogError()
+      raise UnauthorizedUserError()
     return LogSchema.model_validate(log)

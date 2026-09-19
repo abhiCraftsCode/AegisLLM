@@ -6,7 +6,10 @@ from app.modules.auth.schemas import (
   RegisterSchema,
   AuthResponse,
   LoginSchema,
+  ForgotSchema,
+  ResetSchema
 )
+
 from app.modules.auth.service import AuthService
 
 auth_router=APIRouter(prefix="/auth",tags=["Authentication"])
@@ -20,3 +23,11 @@ async def login_user(data:LoginSchema,db:AsyncSession=Depends(get_db)):
 async def register_user(data:RegisterSchema,db:AsyncSession=Depends(get_db)):
   """new user signin request"""
   return await AuthService.register_user(data,db)
+
+@auth_router.post("/forgot-password",response_model=None,status_code=status.HTTP_204_NO_CONTENT)
+async def forgot(data:ForgotSchema,db:AsyncSession=Depends(get_db)):
+  await AuthService.forgot_request(data,db)
+
+@auth_router.post("/reset-password",response_model=None,status_code=status.HTTP_204_NO_CONTENT)
+async def reset(data:ResetSchema,db:AsyncSession=Depends(get_db)):
+  await AuthService.reset_request(data,db)

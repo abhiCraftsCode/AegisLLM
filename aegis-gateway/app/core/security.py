@@ -5,6 +5,7 @@ from jose import jwt,JWTError
 from pwdlib import PasswordHash
 
 from app.core.config import settings
+from app.db.base import utc_now
 
 pwd=PasswordHash.recommended()
 
@@ -20,15 +21,17 @@ def hash_str(raw_str: str) -> str:
     """Generate SHA-256 digest of string (api keys, prompts)."""
     return hashlib.sha256(raw_str.encode("utf-8")).hexdigest()
 
-def create_jwt_token(id: int,token_type:str='access') -> str:
+def create_jwt_token(data:int|str,token_type:str='access') -> str:
     """Issue JWT Tokens."""
     expire=''
     if token_type == "refresh":
-      expire=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+      expire=utc_now() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    elif token_type=="reset":
+      expire= utc_now()+timedelta(minutes=settings.RESET_TOKEN_EXPIRE_MINUTES)
     else:
-      expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+      expire = utc_now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    payload = {"exp": expire, "id":id, "type": token_type}
+    payload = {"exp": expire, "data":id, "type": token_type}
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 def decode_jwt_token(token: str) -> dict[str, Any]|None:

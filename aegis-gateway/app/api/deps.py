@@ -49,10 +49,10 @@ async def get_current_user(
     payload = TokenService.decode_token(token)
 
     # check if token is access token
-    if payload.type != "access":
+    if payload.type != "access" or not isinstance(payload.data,int):
         raise AccessTokenError()
 
-    user_id = payload.id
+    user_id = payload.data
     user = await UserService.get_profile(user_id,db)
 
     return user

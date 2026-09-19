@@ -12,7 +12,6 @@ from app.core.security import verify_password,hash_password
 from app.core.exceptions import (
   UserNotFoundError,
   UserAlreadyExistsError,
-  MissingCredentialsError,
   InvalidCredentialsError
 )
 
@@ -30,6 +29,17 @@ class UserService:
       await db.rollback()
       raise
 
+    return ProfileSchema.model_validate(user)
+
+  @staticmethod
+  async def get_user(identifier:str,db:AsyncSession)->ProfileSchema|None:
+    """get a user row"""
+    # returning without password
+    #for identifier basis fetch
+    repo=UserRepository(db)
+    user=await repo.get_by_identifier(identifier)
+    if user is None:
+      return None
     return ProfileSchema.model_validate(user)
 
   @staticmethod
@@ -69,8 +79,6 @@ class UserService:
   async def password_update(data:PasswordSchema,id:int,db:AsyncSession)->None:
     """verifies and updates password"""
     curr,new=data.curr_password,data.new_password
-    if curr is None:
-      raise MissingCredentialsError()
     repo=UserRepository(db)
     user=await repo.get_by_id(id)
     if user is None:

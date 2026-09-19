@@ -42,15 +42,15 @@ class UserNotFoundError(AppException):
     status_code = 404
     detail = "User not found."
 
+class UnauthorizedUserError(AppException):
+    status=403
+    detail = "You are not authorized to access this service."
 
 # --- API Key Exceptions ---
 class KeyNotFoundError(AppException):
     status_code = 404
     detail = "API key not found."
 
-class UnauthorizedKeyError(AppException):
-    status_code = 403
-    detail = "You are not authorized to access this API key."
 
 class InactiveKeyError(AppException):
     status_code = 401
@@ -69,10 +69,6 @@ class MissingKeyError(AppException):
 class LogNotFoundError(AppException):
     status_code = 404
     detail = "Audit log not found."
-
-class UnauthorizedLogError(AppException):
-    status_code = 403
-    detail = "You are not authorized to access this audit log."
 
 
 # --- Gateway & Upstream LLM Exceptions ---

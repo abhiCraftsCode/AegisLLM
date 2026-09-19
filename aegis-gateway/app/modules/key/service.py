@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_str
 from app.core.exceptions import (
-  UnauthorizedKeyError,
+  UnauthorizedUserError,
   KeyNotFoundError,
   LLMCredentialsError
 )
@@ -62,7 +62,7 @@ class KeyService:
       raise KeyNotFoundError()
 
     if key.user_id != user_id:
-      raise UnauthorizedKeyError()
+      raise UnauthorizedUserError()
 
     try:
       await repo.deactivate(key)  
@@ -89,7 +89,7 @@ class KeyService:
       raise KeyNotFoundError()
 
     if key.user_id != user_id:
-      raise UnauthorizedKeyError()
+      raise UnauthorizedUserError()
 
     return KeySchema.model_validate(key)
 
@@ -119,7 +119,7 @@ class KeyService:
       raise KeyNotFoundError()
 
     if key.user_id!=user_id:
-      raise UnauthorizedKeyError()
+      raise UnauthorizedUserError()
 
     try:
       key.llm_auth=data.llm_auth

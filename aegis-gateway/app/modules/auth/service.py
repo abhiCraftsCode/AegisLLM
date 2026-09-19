@@ -3,13 +3,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.auth.schemas import (
   RegisterSchema,
   AuthResponse,
-  LoginSchema
+  LoginSchema,
+  ForgotSchema,
+  ResetSchema
   )
 from app.modules.user.schemas import ProfileSchema
 from app.core.exceptions import (
   MissingCredentialsError,
   UserAlreadyExistsError,
-  InvalidCredentialsError
+  UnauthorizedUserError,
+  InvalidCredentialsError,
+  InvalidExpiredTokenError
   )
 from app.models import User
 from app.core.security import hash_password,verify_password
@@ -19,6 +23,36 @@ from app.modules.token.service import TokenService
 class AuthService:
   """provides all services related to authentication"""
 
+  @staticmethod
+  async def forgot_request(data:ForgotSchema,db:AsyncSession)->None:
+    """generate and trigger a password reset link"""
+    #only email based recovery now 
+    user=await UserService.get_user(data.email,db)
+    if not user or not user.is_active:
+      return #safety measure to fool attack and hide credential mismatch info
+    #dispatch email using email 
+
+  @staticmethod
+  async def reset_request(data:ResetSchema,db:AsyncSession)->None:
+    """verify and reset password"""
+    payload=TokenService.decode_token(data.token)
+    if payload !="refresh" or not isinstance(payload.data,str):
+      raise InvalidExpiredTokenError()
+    email=payload.data
+    if not email:
+      raise MissingCredentialsError()
+    user=await UserService.find_user(email,db)
+    if not user or not user.is_active:
+      raise UnauthorizedUserError()
+    try:
+      user.password_hash=hash_password(data.new_password)
+      await db.commit()
+    except Exception:
+      await db.rollback()
+      raise
+
+    
+    
   @staticmethod
   async def register_user(data:RegisterSchema,db:AsyncSession)->AuthResponse:
     """register a new user."""

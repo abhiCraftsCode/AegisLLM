@@ -68,4 +68,4 @@ class UpdateSchema(BaseModel):
 class PasswordSchema(BaseModel):
   """request schema for password reset"""
   new_password:str=Field(...,max_length=128,min_length=8)
-  curr_password:str|None=Field(default=None,max_length=128,min_length=8)
+  curr_password:str=Field(...,max_length=128,min_length=8)

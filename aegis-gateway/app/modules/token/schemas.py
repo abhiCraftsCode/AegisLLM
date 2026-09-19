@@ -10,7 +10,9 @@ class TokenPayloadSchema(BaseModel):
   """schema for token structure."""
   model_config=ConfigDict(from_attributes=True)
   
-  id:int
+  data:int|str
   type:str
-  exp:int
+  exp:int  
 
+
+  

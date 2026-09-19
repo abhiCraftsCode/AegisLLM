@@ -34,6 +34,15 @@ class OauthSchema(BaseModel):
   oauth_provider: str = Field(..., max_length=50, examples=["google", "github"])
   oauth_id: str = Field(..., max_length=255, examples=["1082910391039102"])
 
+class ResetSchema(BaseModel):
+  """request schema for password reset"""
+  new_password:str=Field(...,max_length=128,min_length=8)
+  token:str
+
+class ForgotSchema(BaseModel):
+  """request schema for password reset"""
+  email:EmailStr
+
 class AuthResponse(BaseModel):
   """response schema for successful authentication."""
   user:ProfileSchema
