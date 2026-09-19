@@ -14,7 +14,11 @@ from app.modules.key.schemas import (
 
 key_router=APIRouter(prefix="/api-keys",tags=["API Keys"])
 
-@key_router.patch("/{key_id}/update",response_model=KeySchema,status_code=status.HTTP_200_OK)
+@key_router.patch(
+    "/{key_id}/update",
+    response_model=KeySchema,
+    status_code=status.HTTP_200_OK
+    )
 async def update_key(
   key_id:int,
   data:UpstreamConfig,
@@ -25,12 +29,20 @@ async def update_key(
   return await KeyService.update(key_id,user.id,data,db)
 
 @key_router.post("/generate",response_model=GenerateResponse,status_code=status.HTTP_201_CREATED)
-async def generate(data:GenerateSchema,user:User=Depends(get_current_user),db:AsyncSession=Depends(get_db)):
+async def generate(
+  data:GenerateSchema,
+  user:User=Depends(get_current_user),
+  db:AsyncSession=Depends(get_db)
+  ):
   """key generation request"""
   return await KeyService.generate_key(data,user.id,db)
 
-@key_router.post("{key_id}/deactivate",response_model=None,status_code=status.HTTP_204_NO_CONTENT)
-async def deactivate(key_id:int,user:User=Depends(get_current_user),db:AsyncSession=Depends(get_db)):
+@key_router.delete("{key_id}/deactivate",response_model=None,status_code=status.HTTP_204_NO_CONTENT)
+async def deactivate(
+  key_id:int,
+  user:User=Depends(get_current_user),
+  db:AsyncSession=Depends(get_db)
+  ):
   """request to deactivate key"""
   await KeyService.deactivate_key(key_id,user.id,db)
 

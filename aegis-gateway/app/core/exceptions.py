@@ -60,6 +60,10 @@ class InvalidKeyError(AppException):
     status_code = 401
     detail = "Invalid API key."
 
+class MissingKeyError(AppException):
+    status_code = 401
+    detail = "API key is missing."
+
 
 # --- Audit Log Exceptions ---
 class LogNotFoundError(AppException):

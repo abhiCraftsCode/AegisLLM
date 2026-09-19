@@ -10,22 +10,22 @@ class UserSchema(BaseModel):
   @classmethod
   def validate_phone(cls, value):
     if value is None:
-        return None
+      return None
     if not isinstance(value, str):
-        raise ValueError("Phone number must be a string.")
+      raise ValueError("Phone number must be a string.")
     value = value.strip()
     if value.startswith("+91"):
-        number = value[3:]
+      number = value[3:]
     else:
-        number = value
+      number = value
     if len(number) != 10:
-        raise ValueError("Indian phone number must contain 10 digits.")
+      raise ValueError("Indian phone number must contain 10 digits.")
     if not number.isdigit():
-        raise ValueError("Phone number must contain only digits.")
+      raise ValueError("Phone number must contain only digits.")
     if number[0] not in "6789":
-        raise ValueError(
-            "Indian phone number must start with 6, 7, 8, or 9."
-        )
+      raise ValueError(
+          "Indian phone number must start with 6, 7, 8, or 9."
+      )
     return f"+91{number}"
   
 class ProfileSchema(UserSchema):
@@ -47,21 +47,25 @@ class UpdateSchema(BaseModel):
   @classmethod
   def validate_phone(cls, value):
     if value is None:
-        return None
+      return None
     if not isinstance(value, str):
-        raise ValueError("Phone number must be a string.")
+      raise ValueError("Phone number must be a string.")
     value = value.strip()
     if value.startswith("+91"):
-        number = value[3:]
+      number = value[3:]
     else:
-        number = value
+      number = value
     if len(number) != 10:
-        raise ValueError("Indian phone number must contain 10 digits.")
+      raise ValueError("Indian phone number must contain 10 digits.")
     if not number.isdigit():
-        raise ValueError("Phone number must contain only digits.")
+      raise ValueError("Phone number must contain only digits.")
     if number[0] not in "6789":
-        raise ValueError(
-            "Indian phone number must start with 6, 7, 8, or 9."
-        )
+      raise ValueError(
+          "Indian phone number must start with 6, 7, 8, or 9."
+      )
     return f"+91{number}"
-  
+
+class PasswordSchema(BaseModel):
+  """request schema for password reset"""
+  new_password:str=Field(...,max_length=128,min_length=8)
+  curr_password:str|None=Field(default=None,max_length=128,min_length=8)

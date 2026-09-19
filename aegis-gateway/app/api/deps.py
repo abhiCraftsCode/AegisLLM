@@ -15,7 +15,7 @@ from app.core.exceptions import (
     MissingTokenError,
     AccessTokenError,
     InactiveKeyError,
-    InvalidKeyError
+    MissingKeyError
     )
 
 bearer_scheme = HTTPBearer()
@@ -67,7 +67,7 @@ async def get_current_api_key(
     raw_key=credentials.credentials
 
     if raw_key is None or len(raw_key)==0:
-        raise InvalidKeyError()
+        raise MissingKeyError()
     
     hash_key=hash_str(raw_key)
 

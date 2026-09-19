@@ -2,10 +2,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
 from app.modules.user.repository import UserRepository
-from app.modules.user.schemas import ProfileSchema,UpdateSchema
+from app.modules.user.schemas import (
+  ProfileSchema,
+  UpdateSchema,
+  PasswordSchema
+)
 from app.models import User
-from app.core.security import hash_password
-from app.core.exceptions import UserNotFoundError,UserAlreadyExistsError
+from app.core.security import verify_password,hash_password
+from app.core.exceptions import (
+  UserNotFoundError,
+  UserAlreadyExistsError,
+  MissingCredentialsError,
+  InvalidCredentialsError
+)
 
 class UserService:
   """provide all services related to user data."""
@@ -45,8 +54,6 @@ class UserService:
         user.phone=data.phone
       if data.name is not None:
         user.name=data.name
-      if data.password is not None:
-        user.password_hash=hash_password(data.password)
       await db.commit()
       await db.refresh(user)
     except IntegrityError:
@@ -57,6 +64,25 @@ class UserService:
       raise
 
     return ProfileSchema.model_validate(user)
+
+  @staticmethod
+  async def password_update(data:PasswordSchema,id:int,db:AsyncSession)->None:
+    """verifies and updates password"""
+    curr,new=data.curr_password,data.new_password
+    if curr is None:
+      raise MissingCredentialsError()
+    repo=UserRepository(db)
+    user=await repo.get_by_id(id)
+    if user is None:
+      raise UserNotFoundError()
+    if user.password_hash is not None and not verify_password(curr,user.password_hash):
+      raise InvalidCredentialsError()
+    try:
+      user.password_hash=hash_password(new)
+      await db.commit()
+    except Exception:
+      await db.rollback()
+      raise
   
   @staticmethod
   async def get_profile(id:int,db:AsyncSession)->ProfileSchema:
