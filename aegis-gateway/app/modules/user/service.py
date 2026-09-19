@@ -1,9 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from app.modules.user.repository import UserRepository
-from app.modules.user.schemas import ProfileSchema
+from app.modules.user.schemas import ProfileSchema,UpdateSchema
 from app.models import User
-from app.core.exceptions import UserNotFoundError
+from app.core.security import hash_password
+from app.core.exceptions import UserNotFoundError,UserAlreadyExistsError
 
 class UserService:
   """provide all services related to user data."""
@@ -22,13 +24,40 @@ class UserService:
     return ProfileSchema.model_validate(user)
 
   @staticmethod
-  async def find_user(identifier,db)->User|None:
+  async def find_user(identifier:str,db:AsyncSession)->User|None:
     """find a user row else none"""
     repo=UserRepository(db)
     # allowed returning none because some function may require user not to be available
     # returning model instead of schema to match password
     return await repo.get_by_identifier(identifier)
-    
+
+  @staticmethod
+  async def update(data:UpdateSchema,id:int,db:AsyncSession)->ProfileSchema:
+    """update fileds of user row."""
+    repo=UserRepository(db)
+    user=await repo.get_by_id(id)
+    if user is None:
+      raise UserNotFoundError()
+    try:
+      if data.email is not None:
+        user.email=data.email
+      if data.phone is not None:
+        user.phone=data.phone
+      if data.name is not None:
+        user.name=data.name
+      if data.password is not None:
+        user.password_hash=hash_password(data.password)
+      await db.commit()
+      await db.refresh(user)
+    except IntegrityError:
+      await db.rollback()
+      raise UserAlreadyExistsError()
+    except Exception:
+      await db.rollback()
+      raise
+
+    return ProfileSchema.model_validate(user)
+  
   @staticmethod
   async def get_profile(id:int,db:AsyncSession)->ProfileSchema:
     """fetch the profile of a user"""
