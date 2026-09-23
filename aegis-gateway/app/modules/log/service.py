@@ -2,7 +2,7 @@ import math
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import AuditLog
-from app.modules.log.repostiory import LogRepository
+from app.modules.log.repository import LogRepository
 from app.modules.log.schemas import LogSchema,PageResponse
 from app.core.exceptions import UnauthorizedUserError,LogNotFoundError
 
