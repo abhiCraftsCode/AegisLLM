@@ -42,7 +42,8 @@ class UpdateSchema(BaseModel):
   name:str|None=Field(default=None,min_length=2,max_length=100)
   email:EmailStr|None=None
   phone:str|None=Field(default=None,max_length=15,min_length=10)
-  password:str|None=Field(default=None,max_length=128,min_length=8)
+  oauth_provider:str|None=None
+  oauth_id:str|None=None
   @field_validator("phone",mode="before")
   @classmethod
   def validate_phone(cls, value):
@@ -68,4 +69,4 @@ class UpdateSchema(BaseModel):
 class PasswordSchema(BaseModel):
   """request schema for password reset"""
   new_password:str=Field(...,max_length=128,min_length=8)
-  curr_password:str=Field(...,max_length=128,min_length=8)
+  curr_password:str|None=Field(default=None,max_length=128,min_length=8)

@@ -7,7 +7,8 @@ from app.modules.auth.schemas import (
   AuthResponse,
   LoginSchema,
   ForgotSchema,
-  ResetSchema
+  ResetSchema,
+  OauthLogin
 )
 
 from app.modules.auth.service import AuthService
@@ -26,8 +27,15 @@ async def register_user(data:RegisterSchema,db:AsyncSession=Depends(get_db)):
 
 @auth_router.post("/forgot-password",response_model=None,status_code=status.HTTP_204_NO_CONTENT)
 async def forgot(data:ForgotSchema,bgt:BackgroundTasks,db:AsyncSession=Depends(get_db)):
+  """forgot password request"""
   await AuthService.forgot_request(data,bgt,db)
 
 @auth_router.post("/reset-password",response_model=None,status_code=status.HTTP_204_NO_CONTENT)
 async def reset(data:ResetSchema,db:AsyncSession=Depends(get_db)):
+  """reset password request"""
   await AuthService.reset_request(data,db)
+
+@auth_router.post("/oauth",response_model=AuthResponse,status_code=status.HTTP_200_OK)
+async def oauth_login(data:OauthLogin,db:AsyncSession=Depends(get_db)):
+  """oauth login request"""
+  return await AuthService.oauth(data,db)

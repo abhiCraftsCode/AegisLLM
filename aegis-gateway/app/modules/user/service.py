@@ -57,13 +57,11 @@ class UserService:
     user=await repo.get_by_id(id)
     if user is None:
       raise UserNotFoundError()
+    update_data = data.model_dump(exclude_unset=True,exclude_none=True)
+    for field, value in update_data.items():
+        if hasattr(user, field):
+            setattr(user, field, value)
     try:
-      if data.email is not None:
-        user.email=data.email
-      if data.phone is not None:
-        user.phone=data.phone
-      if data.name is not None:
-        user.name=data.name
       await db.commit()
       await db.refresh(user)
     except IntegrityError:
@@ -83,7 +81,15 @@ class UserService:
     user=await repo.get_by_id(id)
     if user is None:
       raise UserNotFoundError()
-    if user.password_hash is not None and not verify_password(curr,user.password_hash):
+    if (
+      user.password_hash is not None and curr is None
+    ) or(
+      user.password_hash is None and curr is not None
+    ) or (
+      user.password_hash is not None 
+      and curr is not None
+      and not verify_password(curr,user.password_hash)
+    ):
       raise InvalidCredentialsError()
     try:
       user.password_hash=hash_password(new)
