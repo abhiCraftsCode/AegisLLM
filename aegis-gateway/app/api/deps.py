@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends,Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from collections.abc import AsyncGenerator
@@ -20,6 +20,9 @@ from app.core.exceptions import (
 
 bearer_scheme = HTTPBearer()
 
+#making static copy of engine
+#__engine_instance=AegisEngine()
+
 #dependency helper function to connect to db
 async def get_db()->AsyncGenerator[AsyncSession,None]:
   """dependency for db connection."""
@@ -30,9 +33,10 @@ async def get_db()->AsyncGenerator[AsyncSession,None]:
       await session.close()
 
 #dependency function to get search engine
-def get_engine()->SecurityEngine:
+def get_engine(req:Request)->SecurityEngine:
     """dependency for engine prerequisite loading"""
-    return AegisEngine()
+    #return __engine_instance
+    return req.app.state.engine
 
 # dependency function to mimic isAuth for jwt
 async def get_current_user(

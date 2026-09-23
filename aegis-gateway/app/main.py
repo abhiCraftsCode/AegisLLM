@@ -3,6 +3,7 @@ from fastapi import FastAPI,Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.core.engine import AegisEngine
 from app.core.exceptions import AppException,exception_handler
 from app.db import engine, Base
 from app.api.router import api_router
@@ -11,10 +12,12 @@ from app.api.router import api_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("[INFO] Aegis Gateway starting up...")
+    app.state.engine=AegisEngine() # one engine for whole lifespan
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
     print("[INFO] Aegis Gateway shutting down...")
+    del app.state.engine
     await engine.dispose()
 
 # main app
