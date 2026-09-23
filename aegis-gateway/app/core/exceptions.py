@@ -76,6 +76,7 @@ class LLMCredentialsError(AppException):
     status_code = 400
     detail = "LLM configuration is missing from this API key."
 
+<<<<<<< HEAD
 # --- DateTime Filter Exceptions ---
 class TimeCredentialsError(AppException):
     status_code=400
@@ -92,6 +93,12 @@ class RangeCredentialsError(AppException):
 class InvalidRangeError(AppException):
     status_code=401
     detail="Invalid date period."
+=======
+# --- Onnx Model Exceptions ---
+class ModelNotFoundError(AppException):
+    status_code = 503
+    detail = "Service Down. Search Engine Failure."
+>>>>>>> engine/model-integration
 
 # --- Universal Clean Handler ---
 async def exception_handler(request: Request, exc: AppException) -> JSONResponse:

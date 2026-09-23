@@ -31,7 +31,8 @@ async def get_db()->AsyncGenerator[AsyncSession,None]:
 
 #dependency function to get search engine
 def get_engine()->SecurityEngine:
-    raise NotImplementedError
+    """dependency for engine prerequisite loading"""
+    return AegisEngine()
 
 # dependency function to mimic isAuth for jwt
 async def get_current_user(
