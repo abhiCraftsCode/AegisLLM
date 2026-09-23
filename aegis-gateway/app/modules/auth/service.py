@@ -6,9 +6,11 @@ from app.modules.auth.schemas import (
   AuthResponse,
   LoginSchema,
   ForgotSchema,
-  ResetSchema
+  ResetSchema,
+  OauthLogin
   )
-from app.modules.user.schemas import ProfileSchema
+from app.core.oauth import get_oauth_user
+from app.modules.user.schemas import ProfileSchema,UpdateSchema
 from app.core.exceptions import (
   MissingCredentialsError,
   UserAlreadyExistsError,
@@ -59,7 +61,37 @@ class AuthService:
       await db.rollback()
       raise
 
-    
+  @staticmethod
+  async def oauth(payload:OauthLogin,db:AsyncSession)->AuthResponse:
+    profile=await get_oauth_user(payload.provider,payload.code)
+    user=await UserService.get_user(profile.email,db)
+    if user:
+      #existing user 
+      if user.oauth_provider is None:
+        # first time oauth of existing
+        user=await UserService.update(
+            data=UpdateSchema(
+            oauth_provider=profile.oauth_provider,
+            oauth_id=profile.oauth_id
+          ),
+          id=user.id,
+          db=db)
+    else:
+      new_user=User(
+        email=profile.email,
+        name=profile.name,
+        password_hash=None,
+        phone=None,
+        oauth_provider=profile.oauth_provider,
+        oauth_id=profile.oauth_id
+      )
+      user=await UserService.create_user(new_user,db)
+    return AuthResponse(
+      user=user,
+      tokens=TokenService.create_tokens(user.id)
+    )
+
+  
     
   @staticmethod
   async def register_user(data:RegisterSchema,db:AsyncSession)->AuthResponse:

@@ -14,6 +14,20 @@ class Settings(BaseSettings):
   REFRESH_TOKEN_EXPIRE_DAYS: int = 2
   RESET_TOKEN_EXPIRE_MINUTES:int = 15
 
+  # OAuth fields  
+  GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+  GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
+  GOOGLE_CLIENT_ID: str = Field(...)
+  GOOGLE_CLIENT_SECRET: SecretStr = Field(...)
+  GOOGLE_REDIRECT_URI: str = "http://localhost:5173/auth/callback/google"
+
+  GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token"
+  GITHUB_USER_URL = "https://api.github.com/user"
+  GITHUB_EMAILS_URL = "https://api.github.com/user/emails"
+  GITHUB_CLIENT_ID: str = Field(...)
+  GITHUB_CLIENT_SECRET: SecretStr = Field(...)
+  GITHUB_REDIRECT_URI: str = "http://localhost:5173/auth/callback/github"
+
   #mail service #mandatory
   MAIL_USERNAME:str = Field(...)
   MAIL_PASSWORD:SecretStr= Field(...) 
