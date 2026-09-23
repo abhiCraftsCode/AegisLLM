@@ -5,7 +5,7 @@ from jose import jwt,JWTError
 from pwdlib import PasswordHash
 
 from app.core.config import settings
-from app.db.base import utc_now
+from app.db import utc_now
 
 pwd=PasswordHash.recommended()
 
