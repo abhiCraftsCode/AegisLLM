@@ -11,7 +11,7 @@ class TokenPayloadSchema(BaseModel):
   model_config=ConfigDict(from_attributes=True)
   
   data:int|str
-  type:str
+  token_type:str
   exp:int
   iat:int
 

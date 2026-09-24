@@ -7,7 +7,7 @@ from app.modules.token.service import TokenService
 
 token_router=APIRouter(prefix="/tokens",tags=["Tokens"])
 
-@token_router.post("/refresh",response_model=TokenSchema,status_code=status.HTTP_201_CREATED)
+@token_router.post("/refresh",response_model=TokenSchema,status_code=status.HTTP_200_OK)
 async def refresh_tokens(db:AsyncSession=Depends(get_db)):
   """to implement refresh token logic but for now s"""
   pass

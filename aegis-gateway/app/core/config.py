@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import Field,SecretStr
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings,SettingsConfigDict
 
 class Settings(BaseSettings):
   """class to configure the app settings from env file."""
@@ -18,19 +18,19 @@ class Settings(BaseSettings):
   GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
   GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
   GOOGLE_CLIENT_ID: str = Field(...)
-  GOOGLE_CLIENT_SECRET: SecretStr = Field(...)
-  GOOGLE_REDIRECT_URI: str = "http://localhost:5173/auth/callback/google"
+  GOOGLE_CLIENT_SECRET: SecretStr = Field(...)#if error do .getsecret() 
+  GOOGLE_REDIRECT_URI: str = Field(...)
 
   GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token"
   GITHUB_USER_URL = "https://api.github.com/user"
   GITHUB_EMAILS_URL = "https://api.github.com/user/emails"
   GITHUB_CLIENT_ID: str = Field(...)
-  GITHUB_CLIENT_SECRET: SecretStr = Field(...)
-  GITHUB_REDIRECT_URI: str = "http://localhost:5173/auth/callback/github"
+  GITHUB_CLIENT_SECRET: SecretStr = Field(...) #if error do .getsecret() 
+  GITHUB_REDIRECT_URI: str = Field(...)
 
   #mail service #mandatory
   MAIL_USERNAME:str = Field(...)
-  MAIL_PASSWORD:SecretStr= Field(...) 
+  MAIL_PASSWORD:SecretStr= Field(...) #always use app password not original password
   MAIL_FROM:str = Field(...)
   MAIL_PORT:int = 587
   MAIL_SERVER:str = Field(...)
@@ -49,10 +49,10 @@ class Settings(BaseSettings):
   FRONTEND_URL:str=Field(...)
 
   #env configuration can be done in 2 ways
-  #config=SettingsConfigDict(env_file=".env",extra="ignore")
-  class Config:
-    env_file=".env"
-    extra="ignore"
+  config=SettingsConfigDict(env_file=".env",extra="ignore")#v2 pydantic
+  # class Config:#v1 pydantic
+  #   env_file=".env"
+  #   extra="ignore"
 
 
 settings=Settings() #type:ignore //requiring fields not available error bcz of editor type checks

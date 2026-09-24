@@ -14,12 +14,12 @@ from app.core.engine import SecurityEngine,AegisEngine
 from app.core.exceptions import (
     MissingTokenError,
     AccessTokenError,
-    InactiveKeyError,
     MissingKeyError
     )
 
 bearer_scheme = HTTPBearer()
 
+"""dependencies should be returning objects of db or orm instead of schema considered best practice"""
 #making static copy of engine
 #__engine_instance=AegisEngine()
 
@@ -54,7 +54,7 @@ async def get_current_user(
     payload = TokenService.decode_token(token)
 
     # check if token is access token
-    if payload.type != "access" or not isinstance(payload.data,int):
+    if payload.token_type != "access" or not isinstance(payload.data,int):
         raise AccessTokenError()
 
     user_id = payload.data
@@ -76,9 +76,4 @@ async def get_current_api_key(
     
     hash_key=hash_str(raw_key)
 
-    key=await KeyService.get_hash_key(hash_key,db)
-
-    if not key.is_active:
-        raise InactiveKeyError()
-
-    return key
+    return await KeyService.get_hash_key(hash_key,db)

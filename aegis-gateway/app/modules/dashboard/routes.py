@@ -10,7 +10,7 @@ from app.modules.dashboard.schemas import StatSchema
 
 stat_router=APIRouter(prefix="/dashboard",tags=["Dashboard"])
 
-@stat_router.get("/stats",response_model=StatSchema,status_code=status.HTTP_201_CREATED)
+@stat_router.get("/stats",response_model=StatSchema,status_code=status.HTTP_200_OK)
 async def get_stat(
   user:ProfileSchema=Depends(get_current_user),
   db:AsyncSession=Depends(get_db),

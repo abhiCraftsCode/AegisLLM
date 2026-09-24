@@ -5,4 +5,4 @@ class Base(DeclarativeBase):
   pass
 
 def utc_now()->datetime:
-  return datetime.now(timezone.utc);
+  return datetime.now(timezone.utc)

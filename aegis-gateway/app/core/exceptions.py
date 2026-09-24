@@ -43,7 +43,7 @@ class UserNotFoundError(AppException):
     detail = "User not found."
 
 class UnauthorizedUserError(AppException):
-    status=403
+    status_code=403
     detail = "You are not authorized to access this service."
 
 # --- API Key Exceptions ---
@@ -76,13 +76,17 @@ class LLMCredentialsError(AppException):
     status_code = 400
     detail = "LLM configuration is missing from this API key."
 
+class UpstreamLLMError(AppException):
+    status_code = 502
+    detail = "Upstream LLM request failed."
+
 # --- DateTime Filter Exceptions ---
 class TimeCredentialsError(AppException):
     status_code=400
     detail="Year or Month value is missing."
 
 class InvalidMonthError(AppException):
-    status_code=401
+    status_code=400
     detail="Invalid Month entered."
 
 class RangeCredentialsError(AppException):
@@ -90,7 +94,7 @@ class RangeCredentialsError(AppException):
     detail="From or To date is missing."
 
 class InvalidRangeError(AppException):
-    status_code=401
+    status_code=400
     detail="Invalid date period."
 # --- Onnx Model Exceptions ---
 class ModelNotFoundError(AppException):

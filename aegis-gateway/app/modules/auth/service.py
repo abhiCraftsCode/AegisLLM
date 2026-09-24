@@ -7,9 +7,8 @@ from app.modules.auth.schemas import (
   LoginSchema,
   ForgotSchema,
   ResetSchema,
-  OauthLogin
   )
-from app.core.oauth import get_oauth_user
+from app.core.oauth import get_oauth_user,OauthLoginSchema
 from app.modules.user.schemas import ProfileSchema,UpdateSchema
 from app.core.exceptions import (
   MissingCredentialsError,
@@ -42,7 +41,7 @@ class AuthService:
   async def reset_request(data:ResetSchema,db:AsyncSession)->None:
     """verify and reset password"""
     payload=TokenService.decode_token(data.token)
-    if payload !="refresh" or not isinstance(payload.data,str):
+    if payload.token_type !="reset" or not isinstance(payload.data,str):
       raise InvalidExpiredTokenError()
     email=payload.data
     if not email:
@@ -50,6 +49,7 @@ class AuthService:
     user=await UserService.find_user(email,db)
     if not user or not user.is_active:
       raise UnauthorizedUserError()
+    # use a new field passwrd changed at instead of updated at
     if user.updated_at is not None:
       time=int(user.updated_at.timestamp())
       if time>payload.iat:
@@ -62,7 +62,7 @@ class AuthService:
       raise
 
   @staticmethod
-  async def oauth(payload:OauthLogin,db:AsyncSession)->AuthResponse:
+  async def oauth(payload:OauthLoginSchema,db:AsyncSession)->AuthResponse:
     profile=await get_oauth_user(payload.provider,payload.code)
     user=await UserService.get_user(profile.email,db)
     if user:

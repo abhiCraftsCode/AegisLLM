@@ -14,7 +14,7 @@ class User(Base):
   phone:Mapped[str|None]=mapped_column(String(15),unique=True,index=True,nullable=True)
   password_hash:Mapped[str|None]=mapped_column(String(255),nullable=True)
   oauth_provider:Mapped[str|None]=mapped_column(String(50),nullable=True)
-  oauth_id:Mapped[str|None]=mapped_column(String(255),nullable=True,index=True)
+  oauth_id:Mapped[str|None]=mapped_column(String(255),nullable=True,index=True,unique=True)
   is_active:Mapped[bool]=mapped_column(Boolean,default=True)
   created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=utc_now)
   updated_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=utc_now,onupdate=utc_now)

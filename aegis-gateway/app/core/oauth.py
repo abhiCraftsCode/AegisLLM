@@ -1,15 +1,35 @@
 import httpx
-
+from enum import Enum
+from pydantic import BaseModel,EmailStr,Field
 from app.core.config import settings
 from app.core.exceptions import InvalidCredentialsError
-from app.modules.auth.schemas import OauthProfile,OAuthProvider
 
-async def fetch_google_user(code:str)->OauthProfile:
+
+class OAuthProvider(str, Enum):
+    """constants for oauth"""
+    GOOGLE = "google"
+    GITHUB = "github"
+
+class OauthLoginSchema(BaseModel):
+  """request schema for oauth login."""
+  provider:OAuthProvider
+  code:str
+
+class OauthProfileSchema(BaseModel):
+  """request schema used in oauth login process."""
+  email:EmailStr
+  name:str|None=None
+  oauth_provider:OAuthProvider = Field(..., max_length=50, examples=["google", "github"])
+  oauth_id: str = Field(..., max_length=255, examples=["1082910391039102"])
+
+
+
+async def fetch_google_user(code:str)->OauthProfileSchema:
   """exchange code for google user details."""
   data={
     "code":code,
     "client_id":settings.GOOGLE_CLIENT_ID,
-    "client_secret":settings.GOOGLE_CLIENT_SECRET,
+    "client_secret":settings.GOOGLE_CLIENT_SECRET.get_secret_value(),
     "redirect_uri":settings.GOOGLE_REDIRECT_URI,
     "grant_type":"authorization_code"
   }
@@ -28,23 +48,23 @@ async def fetch_google_user(code:str)->OauthProfile:
     info=user_resp.json()
     if not info.get("email_verified"):
       raise InvalidCredentialsError()
-    return OauthProfile(
+    return OauthProfileSchema(
       oauth_id=str(info["sub"]),
       oauth_provider=OAuthProvider.GOOGLE,
       email=info["email"],
       name=info["name"]
     )
 
-async def fetch_github_user(code:str)->OauthProfile:
+async def fetch_github_user(code:str)->OauthProfileSchema:
   """exchange code for github user details."""
   data={
     "code":code,
     "client_id":settings.GITHUB_CLIENT_ID,
-    "client_secret":settings.GITHUB_CLIENT_SECRET,
+    "client_secret":settings.GITHUB_CLIENT_SECRET.get_secret_value(),
     "redirect_uri":settings.GITHUB_REDIRECT_URI
   }
   headers={"Accept":"application/json"}
-  async with httpx.AsyncClient() as client:
+  async with httpx.AsyncClient(timeout=10.0) as client:
     token_resp=await client.post(settings.GITHUB_TOKEN_URL,data=data,headers=headers)
     if token_resp.is_error:
       raise InvalidCredentialsError()
@@ -71,7 +91,7 @@ async def fetch_github_user(code:str)->OauthProfile:
     if not verified_primary:
         raise InvalidCredentialsError()
 
-    return OauthProfile(
+    return OauthProfileSchema(
         oauth_provider=OAuthProvider.GITHUB,
         oauth_id=str(user_info["id"]),
         email=verified_primary,
@@ -79,7 +99,7 @@ async def fetch_github_user(code:str)->OauthProfile:
     )
 
 
-async def get_oauth_user(provider: OAuthProvider, code: str) -> OauthProfile:
+async def get_oauth_user(provider: OAuthProvider, code: str) -> OauthProfileSchema:
     """Dispatches to the correct OAuth handler."""
     if provider == OAuthProvider.GOOGLE:
         return await fetch_google_user(code)

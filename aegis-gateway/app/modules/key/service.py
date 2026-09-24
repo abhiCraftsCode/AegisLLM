@@ -2,11 +2,13 @@ import secrets
 import math
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import hash_str
+from app.core.security import hash_str,encrypt_field
+from app.db import utc_now
 from app.core.exceptions import (
   UnauthorizedUserError,
   KeyNotFoundError,
-  LLMCredentialsError
+  LLMCredentialsError,
+  InactiveKeyError
 )
 from app.modules.key.repository import KeyRepository
 from app.models import ApiKey
@@ -16,7 +18,7 @@ from app.modules.key.schemas import (
   GenerateResponse,
   GenerateSchema,
   UpstreamConfig,
-  ConfigResponse
+  ConfigInternalResponse
 )
 
 class KeyService:
@@ -37,7 +39,7 @@ class KeyService:
       user_id=user_id,
       llm_name=data.llm_name,
       llm_url=data.llm_url,
-      llm_auth=data.llm_auth
+      llm_auth=encrypt_field(data.llm_auth)
     )
     try:
       new_key=await repo.create(new_key)
@@ -105,12 +107,22 @@ class KeyService:
   @staticmethod
   async def get_hash_key(hash:str,db:AsyncSession)->KeySchema:
     """fetch key with particular hash value"""
+    """used in dependency function"""
     repo=KeyRepository(db)
     key=await repo.get_by_hash(hash)
     
     if key is None:
       raise KeyNotFoundError()
-    
+    if not key.is_active:
+      raise InactiveKeyError()
+    #this whole section needs to be moved out not a good practice to do here
+    try:
+      key.last_used_at=utc_now()
+      await db.commit()
+      await db.refresh(key)
+    except:
+      await db.rollback()
+      raise
     return KeySchema.model_validate(key)
 
   @staticmethod
@@ -131,7 +143,7 @@ class KeyService:
       raise UnauthorizedUserError()
 
     try:
-      key.llm_auth=data.llm_auth
+      key.llm_auth=encrypt_field(data.llm_auth)
       key.llm_url=data.llm_url
       key.llm_name=data.llm_name
       await db.commit()
@@ -143,14 +155,14 @@ class KeyService:
     return KeySchema.model_validate(key)
 
   @staticmethod
-  async def get_llm_config(key_id,db:AsyncSession)->ConfigResponse:
+  async def get_llm_config(key_id,db:AsyncSession)->ConfigInternalResponse:
     """fetches llm  configuration of a key"""
     repo=KeyRepository(db)
     key=await repo.get_by_id(key_id)
     if key is None or key.llm_url is None or key.llm_auth is None:
       raise LLMCredentialsError()
 
-    return ConfigResponse(
+    return ConfigInternalResponse(
       llm_auth=key.llm_auth,
       llm_url=key.llm_url
     )

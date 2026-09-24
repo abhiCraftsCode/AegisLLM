@@ -37,7 +37,7 @@ class AegisEngine(SecurityEngine):
       #early exit
       return InspectionResult(
         is_blocked=blocked,
-        latency_ms=latency,
+        latency_ms=latency*1000.0,
         threat_score=score,
         reason=reason
       )
@@ -54,5 +54,5 @@ class AegisEngine(SecurityEngine):
       reason=reason,
       threat_score=score,
       is_blocked=blocked,
-      latency_ms=latency
+      latency_ms=latency*1000.0
     )

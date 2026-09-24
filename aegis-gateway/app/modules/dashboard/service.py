@@ -4,7 +4,7 @@ from typing import Literal
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import utc_now
-from app.modules.dashboard.repository import StatReposityory
+from app.modules.dashboard.repository import StatRepository
 from app.modules.dashboard.schemas import (
   StatSchema,
   DaySchema,
@@ -77,27 +77,33 @@ class StatService:
     from_date:date|None=None
     )->StatSchema:
     """fetch and create the statistics for the dashboard"""
-    today=utc_now() #makes the datetime into date
+    today=utc_now().date() #makes the datetime into date
 
     # adjusting time period for queries
     if period == "lifetime":
       stats_start=None
       stats_end=None
       activity_start=today-timedelta(days=6)
-      activity_end=today+timedelta(days=1)
+      activity_end=today
     elif period == "monthly":
       if year is None or month is None:
         raise TimeCredentialsError()
-      if month<1 and month>12:
+      if month<1 or month>12:
         raise InvalidMonthError()
-      last_day=monthrange(year,month)[1]
-      activity_start=stats_start=datetime.combine(
-        date(year,month,1),
+      start = date(year, month, 1)
+      if month == 12:
+        end = date(year + 1, 1, 1)
+      else:
+        end = date(year, month + 1, 1)
+      activity_start=start
+      stats_start=datetime.combine(
+        start,
         time.min,
         tzinfo=timezone.utc
       )
-      activity_end=stats_end=datetime.combine( 
-        date(year,month,last_day),
+      activity_end=end-timedelta(days=1)
+      stats_end=datetime.combine( 
+        end,
         time.min, 
         tzinfo=timezone.utc 
       )
@@ -106,13 +112,15 @@ class StatService:
         raise RangeCredentialsError()
       if from_date>to_date:
         raise InvalidRangeError()
-      activity_start=stats_start=datetime.combine( 
+      activity_start=from_date
+      stats_start=datetime.combine( 
         from_date, 
         time.min, 
         tzinfo=timezone.utc
       )
-      activity_end=stats_end=datetime.combine(
-        to_date,
+      activity_end=to_date
+      stats_end=datetime.combine(
+        to_date+timedelta(days=1),
         time.min,
         tzinfo=timezone.utc
       )
@@ -120,7 +128,7 @@ class StatService:
       raise InvalidRangeError()
 
     # fetching statistical records    
-    repo=StatReposityory(db)
+    repo=StatRepository(db)
     log_stats=await repo.get_log_stats(
       user_id=user_id,
       start_date=stats_start,
@@ -129,8 +137,8 @@ class StatService:
     key_stats=await repo.get_key_stats(user_id)
     activity_rows=await repo.get_activity(
       user_id=user_id,
-      start_date=activity_start,
-      end_date=activity_end
+      start_date=datetime.combine(activity_start,time.min,tzinfo=timezone.utc),
+      end_date=datetime.combine(activity_end+timedelta(days=1),time.min,tzinfo=timezone.utc)
     )
 
     # returning in form of schema
@@ -139,7 +147,7 @@ class StatService:
       allowed_requests=log_stats.total_requests-log_stats.blocked_requests,
       blocked_requests=log_stats.blocked_requests,
       block_rate=round(
-        (log_stats.block_requests/log_stats.total_requests)*100
+        (log_stats.blocked_requests/log_stats.total_requests)*100
         if log_stats.total_requests>0
         else 0.0,
         2
@@ -151,8 +159,8 @@ class StatService:
       active_keys=key_stats.active_keys,
       # activity builder for mapping to schema
       activity=await StatService._build_activity(
-        activity_start.date(),
-        activity_end.date(),
+        activity_start,
+        activity_end,
         activity_rows
       )
     )

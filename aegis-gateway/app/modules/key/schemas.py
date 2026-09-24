@@ -1,16 +1,26 @@
 from datetime import datetime
-from pydantic import BaseModel,Field,ConfigDict,computed_field
+from pydantic import BaseModel,Field,ConfigDict,field_validator
 
 class GenerateSchema(BaseModel):
   """request schema for generating key."""
   name:str|None=Field(default=None,max_length=100,examples=["Production Chatbot"])
   llm_name:str|None=Field(default=None,max_length=100,examples=["My LLM"])
-  llm_auth:str|None=Field(default=None,examples=["Bearer xx-api-key-xx"])
+  llm_auth:str|None=Field(default=None,examples=["xx-api-key-xx"])
   llm_url:str|None=Field(
     default=None,
     max_length=500,
     examples=["//https:/example.com/v1/chat/completions"]
     )
+  @field_validator("llm_auth")
+  @classmethod
+  def sanitize_llm_auth(cls, v: str | None) -> str | None:
+      if not v:
+          return None
+      v = v.strip()
+      # Automatically strip "Bearer " or "bearer " if user pasted it
+      if v.lower().startswith("bearer "):
+          return v[7:].strip()
+      return v
 
 class KeySchema(BaseModel):
   """response schema for key."""
@@ -25,14 +35,7 @@ class KeySchema(BaseModel):
   created_at:datetime
   llm_name:str|None
   llm_url:str|None
-  @computed_field
-  @property
-  def has_llm_auth(self) -> bool:
-    return (
-      getattr(self, "llm_auth", None) is not None 
-      and getattr(self,"llm_url",None) is not None
-    )
-
+  
 class GenerateResponse(BaseModel):
   """response to be sent at key generation."""
   key:KeySchema
@@ -44,8 +47,18 @@ class UpstreamConfig(BaseModel):
   llm_name:str|None=Field(default=None,max_length=100)
   llm_url:str|None=Field(default=None,max_length=500)
   llm_auth:str|None=None
+  @field_validator("llm_auth")
+  @classmethod
+  def sanitize_llm_auth(cls, v: str | None) -> str | None:
+      if not v:
+          return None
+      v = v.strip()
+      # Automatically strip "Bearer " or "bearer " if user pasted it
+      if v.lower().startswith("bearer "):
+          return v[7:].strip()
+      return v
 
-class ConfigResponse(BaseModel):
+class ConfigInternalResponse(BaseModel):
   """response schema for updated credentials"""
   llm_url:str
   llm_auth:str

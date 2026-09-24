@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import ApiKey,AuditLog
 
-class StatReposityory:
+class StatRepository:
   """repository for statistical features"""
   def __init__(self,db:AsyncSession) -> None:
     self.db=db
@@ -25,7 +25,7 @@ class StatReposityory:
     if start_date is not None:
       conditions.append(AuditLog.created_at>=start_date)
     if end_date is not None:
-      conditions.append(AuditLog.created_at<=end_date)
+      conditions.append(AuditLog.created_at<end_date)
 
     stmt=select(
       func.count(AuditLog.id).label("total_requests"),
@@ -66,7 +66,7 @@ class StatReposityory:
     ).where(
       AuditLog.user_id==user_id,
       AuditLog.created_at>=start_date,
-      AuditLog.created_at<=end_date
+      AuditLog.created_at<end_date
     ).group_by(
       func.date(AuditLog.created_at)
       ).order_by(
