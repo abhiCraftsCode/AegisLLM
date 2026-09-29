@@ -44,6 +44,7 @@ class Settings(BaseSettings):
   DATABASE_URL:str=Field(...)
   MODEL_PATH:str=Field(...)
   SECRET_KEY:str=Field(...)
+  ENCRYPTION_KEY:str=Field(...)
   GATEWAY_KEY:str=Field(...)
   ALLOWED_ORIGINS: List[str] = Field(...)
   FRONTEND_URL:str=Field(...)

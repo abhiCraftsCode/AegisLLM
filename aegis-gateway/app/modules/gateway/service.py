@@ -12,7 +12,7 @@ from app.modules.gateway.schemas import (
   ChatCompletionResponse
 )
 from app.modules.key.schemas import KeySchema
-from app.core.security import decrypt_field
+from app.core.security import decrypt_field,encrypt_field
 from app.core.exceptions import UpstreamLLMError
 
 class GatewayService:
@@ -34,6 +34,7 @@ class GatewayService:
         request_id=request_id,
         user_id=key.user_id,
         key_id=key.id,
+        prompt_hash=encrypt_field(prompt),
         threat_score=result.threat_score,
         is_blocked=result.is_blocked,
         reason=result.reason,
@@ -65,6 +66,7 @@ class GatewayService:
         request_id=request_id,
         user_id=key.user_id,
         key_id=key.id,
+        prompt_hash=encrypt_field(prompt),
         threat_score=result.threat_score,
         is_blocked=result.is_blocked,
         reason=result.reason,
@@ -99,4 +101,27 @@ class GatewayService:
     chat_response.response=res.json()
     return chat_response
 
-  
+  from ipaddress import ip_address
+from urllib.parse import urlparse
+
+
+# below is the basic llm url protection that must be applied for v2
+# def validate_llm_url(url: str) -> None:
+#     parsed = urlparse(url)
+
+#     if parsed.scheme != "https":
+#         raise InvalidLLMURLError()
+
+#     if not parsed.hostname or parsed.username or parsed.password:
+#         raise InvalidLLMURLError()
+
+#     try:
+#         address = ip_address(parsed.hostname)
+#     except ValueError:
+#         address = None
+
+#     if address is not None and not address.is_global:
+#         raise InvalidLLMURLError()
+
+#     if parsed.hostname.lower() == "localhost":
+#         raise InvalidLLMURLError()

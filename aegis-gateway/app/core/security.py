@@ -13,7 +13,7 @@ pwd=PasswordHash.recommended()
 
 def _get_fernet_key() -> bytes:
   """Derive a valid 32-byte url-safe base64 key from your SECRET_KEY"""
-  key_digest = hashlib.sha256(settings.SECRET_KEY.encode()).digest()
+  key_digest = hashlib.sha256(settings.ENCRYPTION_KEY.encode()).digest()
   return base64.urlsafe_b64encode(key_digest)
 
 def encrypt_field(plain_text: str | None) -> str | None:

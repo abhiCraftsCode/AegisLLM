@@ -69,6 +69,7 @@ class AuthService:
       #existing user 
       if user.oauth_provider is None:
         # first time oauth of existing
+        # need to make oauth mulitvalued/ seperate table for multiple oauth service
         user=await UserService.update(
             data=UpdateSchema(
             oauth_provider=profile.oauth_provider,
@@ -77,9 +78,12 @@ class AuthService:
           id=user.id,
           db=db)
     else:
+      name = profile.name
+      if not name or not name.strip():
+          name = profile.email.split("@")[0]
       new_user=User(
         email=profile.email,
-        name=profile.name,
+        name=name,#safety measure
         password_hash=None,
         phone=None,
         oauth_provider=profile.oauth_provider,

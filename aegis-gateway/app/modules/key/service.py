@@ -8,7 +8,8 @@ from app.core.exceptions import (
   UnauthorizedUserError,
   KeyNotFoundError,
   LLMCredentialsError,
-  InactiveKeyError
+  InactiveKeyError,
+  InvalidKeyError
 )
 from app.modules.key.repository import KeyRepository
 from app.models import ApiKey
@@ -112,7 +113,8 @@ class KeyService:
     key=await repo.get_by_hash(hash)
     
     if key is None:
-      raise KeyNotFoundError()
+      raise InvalidKeyError()#need to make more better central exceptions 
+    #generalised exceptions raise with messages in v2
     if not key.is_active:
       raise InactiveKeyError()
     #this whole section needs to be moved out not a good practice to do here
