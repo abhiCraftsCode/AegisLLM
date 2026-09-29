@@ -47,7 +47,7 @@ async def deactivate(
   """request to deactivate key"""
   await KeyService.deactivate_key(key_id,user.id,db)
 
-@key_router.get("/all",response_model=PageResponse[KeySchema],status_code=status.HTTP_200_OK)
+@key_router.get("/all",response_model=PageResponse,status_code=status.HTTP_200_OK)
 async def get_all_keys(
   page:int=Query(default=1,ge=1),
   size:int=Query(default=20,ge=1,le=100),

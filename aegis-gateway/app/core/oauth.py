@@ -76,7 +76,7 @@ async def fetch_github_user(code:str)->OauthProfileSchema:
       "Authorization": f"Bearer {access_token}",
       "Accept": "application/vnd.github+json",
     }
-    user_resp=await client.get(settings.GITHUB_USER_URL,headers=auth_headers)
+    user_resp=await client.get(settings.GITHUB_USERINFO_URL,headers=auth_headers)
     if user_resp.is_error:
       raise InvalidCredentialsError()
     user_info=user_resp.json()

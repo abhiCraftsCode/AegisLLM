@@ -1,4 +1,4 @@
-from typing import List
+from typing import List,ClassVar
 from pydantic import Field,SecretStr
 from pydantic_settings import BaseSettings,SettingsConfigDict
 
@@ -15,15 +15,15 @@ class Settings(BaseSettings):
   RESET_TOKEN_EXPIRE_MINUTES:int = 15
 
   # OAuth fields  
-  GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
-  GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo"
+  GOOGLE_TOKEN_URL:ClassVar[str] = "https://oauth2.googleapis.com/token"
+  GOOGLE_USERINFO_URL:ClassVar[str] = "https://www.googleapis.com/oauth2/v3/userinfo"
   GOOGLE_CLIENT_ID: str = Field(...)
   GOOGLE_CLIENT_SECRET: SecretStr = Field(...)#if error do .getsecret() 
   GOOGLE_REDIRECT_URI: str = Field(...)
 
-  GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token"
-  GITHUB_USER_URL = "https://api.github.com/user"
-  GITHUB_EMAILS_URL = "https://api.github.com/user/emails"
+  GITHUB_TOKEN_URL:ClassVar[str] = "https://github.com/login/oauth/access_token"
+  GITHUB_USERINFO_URL:ClassVar[str] = "https://api.github.com/user"
+  GITHUB_EMAILS_URL:str = "https://api.github.com/user/emails"
   GITHUB_CLIENT_ID: str = Field(...)
   GITHUB_CLIENT_SECRET: SecretStr = Field(...) #if error do .getsecret() 
   GITHUB_REDIRECT_URI: str = Field(...)
@@ -50,8 +50,10 @@ class Settings(BaseSettings):
   FRONTEND_URL:str=Field(...)
 
   #env configuration can be done in 2 ways
-  config=SettingsConfigDict(env_file=".env",extra="ignore")#v2 pydantic
-  # class Config:#v1 pydantic
+  #v2 pydantic
+  model_config=SettingsConfigDict(env_file=".env",extra="ignore")
+  #v1 pydantic
+  # class Config:
   #   env_file=".env"
   #   extra="ignore"
 

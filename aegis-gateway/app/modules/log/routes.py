@@ -9,7 +9,7 @@ from app.api.deps import get_current_user
 
 log_router=APIRouter(prefix="/audit-logs",tags=["Audit Log"])
 
-@log_router.get("/all",response_model=PageResponse[LogSchema],status_code=status.HTTP_200_OK)
+@log_router.get("/all",response_model=PageResponse,status_code=status.HTTP_200_OK)
 async def get_logs(
   page:int=Query(default=1,ge=1),
   size:int=Query(default=20,ge=1,le=100),
