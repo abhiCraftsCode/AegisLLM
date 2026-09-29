@@ -29,7 +29,8 @@ class Settings(BaseSettings):
   GITHUB_REDIRECT_URI: str = Field(...)
 
   #mail service #mandatory
-  MAIL_USERNAME:str = Field(...)
+  MAIL_USERNAME:str = "AegisLLM"
+  # vimp i have to revoke and get new app password for mail old compromised
   MAIL_PASSWORD:SecretStr= Field(...) #always use app password not original password
   MAIL_FROM:str = Field(...)
   MAIL_PORT:int = 587
