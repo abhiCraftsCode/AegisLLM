@@ -8,6 +8,10 @@ from app.modules.auth.schemas import (
   LoginSchema,
   ForgotSchema,
   ResetSchema,
+<<<<<<< HEAD
+=======
+  OauthLogin
+>>>>>>> 17d9fee965e0c36de9e1f1f3c0e0f3435298c0a1
 )
 from app.core.oauth import OauthLoginSchema
 from app.modules.auth.service import AuthService
@@ -35,6 +39,10 @@ async def reset(data:ResetSchema,db:AsyncSession=Depends(get_db)):
   await AuthService.reset_request(data,db)
 
 @auth_router.post("/oauth",response_model=AuthResponse,status_code=status.HTTP_200_OK)
+<<<<<<< HEAD
 async def oauth_login(data:OauthLoginSchema,db:AsyncSession=Depends(get_db)):
+=======
+async def oauth_login(data:OauthLogin,db:AsyncSession=Depends(get_db)):
+>>>>>>> 17d9fee965e0c36de9e1f1f3c0e0f3435298c0a1
   """oauth login request"""
   return await AuthService.oauth(data,db)

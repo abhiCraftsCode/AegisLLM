@@ -76,10 +76,13 @@ class LLMCredentialsError(AppException):
     status_code = 400
     detail = "LLM configuration is missing from this API key."
 
+<<<<<<< HEAD
 class UpstreamLLMError(AppException):
     status_code = 502
     detail = "Upstream LLM request failed."
 
+=======
+>>>>>>> 17d9fee965e0c36de9e1f1f3c0e0f3435298c0a1
 # --- DateTime Filter Exceptions ---
 class TimeCredentialsError(AppException):
     status_code=400

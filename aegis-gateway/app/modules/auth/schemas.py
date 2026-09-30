@@ -1,4 +1,5 @@
 from pydantic import BaseModel,EmailStr,Field
+from enum import Enum
 
 from app.modules.token.schemas import TokenSchema
 from app.modules.user.schemas import UserSchema,ProfileSchema
@@ -27,6 +28,26 @@ class LoginSchema(BaseModel):
                       examples=["password@123"]
                       )
 
+<<<<<<< HEAD
+=======
+class OAuthProvider(str, Enum):
+    """constants for oauth"""
+    GOOGLE = "google"
+    GITHUB = "github"
+
+class OauthLogin(BaseModel):
+  """request schema for oauth login."""
+  provider:OAuthProvider
+  code:str
+
+class OauthProfile(BaseModel):
+  """request schema used in oauth login process."""
+  email:EmailStr
+  name:str|None=None
+  oauth_provider:OAuthProvider = Field(..., max_length=50, examples=["google", "github"])
+  oauth_id: str = Field(..., max_length=255, examples=["1082910391039102"])
+
+>>>>>>> 17d9fee965e0c36de9e1f1f3c0e0f3435298c0a1
 class ResetSchema(BaseModel):
   """request schema for password reset"""
   new_password:str=Field(...,max_length=128,min_length=8)
