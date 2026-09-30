@@ -25,9 +25,9 @@ class StatService:
     """maps the activity schema witht the repo result"""
     #structure with schema
     act_map={
-      row.date:{
-        "total_requests":row.total_requests,
-        "blocked_requests":row.blocked_requests
+      date.fromisoformat(row.date): {
+        "total_requests": row.total_requests,
+        "blocked_requests": row.blocked_requests
       }
       for row in rows
     }
@@ -140,6 +140,11 @@ class StatService:
       start_date=datetime.combine(activity_start,time.min,tzinfo=timezone.utc),
       end_date=datetime.combine(activity_end+timedelta(days=1),time.min,tzinfo=timezone.utc)
     )
+
+    # error check
+    print("ACTIVITY ROWS:")
+    for row in activity_rows:
+      print(row.date, type(row.date), row.total_requests, row.blocked_requests)
 
     # returning in form of schema
     return StatSchema(

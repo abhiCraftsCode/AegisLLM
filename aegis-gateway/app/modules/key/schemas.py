@@ -42,11 +42,16 @@ class GenerateResponse(BaseModel):
   # only sent once in this generation response
   secret:str # raw key
 
-class UpstreamConfig(BaseModel):
-  """request to be sent for upstream forwarding"""
-  llm_name:str|None=Field(default=None,max_length=100)
-  llm_url:str|None=Field(default=None,max_length=500)
-  llm_auth:str|None=None
+class UpdateSchema(BaseModel):
+  """request schema to update fields of api-key"""
+  name:str|None=Field(default=None,max_length=100,examples=["Production Chatbot"])
+  llm_name:str|None=Field(default=None,max_length=100,examples=["My LLM"])
+  llm_auth:str|None=Field(default=None,examples=["xx-api-key-xx"])
+  llm_url:str|None=Field(
+    default=None,
+    max_length=500,
+    examples=["//https:/example.com/v1/chat/completions"]
+    )
   @field_validator("llm_auth")
   @classmethod
   def sanitize_llm_auth(cls, v: str | None) -> str | None:
@@ -66,7 +71,7 @@ class ConfigInternalResponse(BaseModel):
 class PageResponse(BaseModel):
   """resonse schema for keys page-wise to display."""
   items:list[KeySchema]
-  page:int
-  size:int
-  total:int
-  pages:int
+  page:int #current page
+  size:int #page size
+  total:int #total keys
+  pages:int #total pages

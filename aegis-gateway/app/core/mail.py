@@ -41,7 +41,8 @@ async def send_mail(email:EmailStr,token:str)->None:
       </body>
     </html>
     """
-
+  # currently mail consist of link pasting option too 
+  # for security we later remove that and make only button reset
   message = MessageSchema(
         subject="Reset-Password Request",
         recipients=[NameEmail(name="",email=email)],

@@ -8,6 +8,7 @@ class LogSchema(BaseModel):
 
     id: int
     request_id:UUID
+    prompt:str|None=None
     key_id: int | None = None
     threat_score: float
     is_blocked: bool

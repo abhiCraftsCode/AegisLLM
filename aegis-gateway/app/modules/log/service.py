@@ -5,6 +5,7 @@ from app.models import AuditLog
 from app.modules.log.repository import LogRepository
 from app.modules.log.schemas import LogSchema,PageResponse
 from app.core.exceptions import UnauthorizedUserError,LogNotFoundError
+from app.core.security import decrypt_field
 
 class LogService:
   """provide all services for audit-logs"""
@@ -45,4 +46,6 @@ class LogService:
       raise LogNotFoundError()
     if log.user_id!=user_id:
       raise UnauthorizedUserError()
-    return LogSchema.model_validate(log)
+    data=LogSchema.model_validate(log)
+    data.prompt=decrypt_field(log.prompt_hash)
+    return data

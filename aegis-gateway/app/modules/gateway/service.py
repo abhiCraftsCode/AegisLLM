@@ -13,7 +13,7 @@ from app.modules.gateway.schemas import (
 )
 from app.modules.key.schemas import KeySchema
 from app.core.security import decrypt_field,encrypt_field
-from app.core.exceptions import UpstreamLLMError
+from app.core.exceptions import UpstreamLLMError,InvalidCredentialsError
 
 class GatewayService:
   """services related to the proxy gateway"""
@@ -26,6 +26,9 @@ class GatewayService:
     db:AsyncSession
     )->InspectResponse:
     """inspect prompt and audit respective log"""
+    if not prompt.strip():
+      raise InvalidCredentialsError("Prompt Missing.")
+    
     request_id=uuid4()
 
     result=await eng.inspect(prompt)
@@ -56,10 +59,12 @@ class GatewayService:
     # check for llm credentials availability
     config=await KeyService.get_llm_config(key.id,db)
     
-    request_id=uuid4()
     usr_msg=[message.content for message in data.messages if message.role=="user"]
     prompt="\n".join(usr_msg)
-
+    if not prompt.strip():
+      raise InvalidCredentialsError("Prompt Missing.")
+    
+    request_id=uuid4()
     result=await eng.inspect(prompt)
 
     audit_log = AuditLog(
@@ -82,7 +87,8 @@ class GatewayService:
     if result.is_blocked:
       return chat_response
     auth=decrypt_field(config.llm_auth)
-    if auth is None: raise #only for safety real error already raised in service
+    if auth is None: 
+      raise #only for safety real error already raised in service
     upstream_paload=data.model_dump()
     # global static nature fetch call 
     # so that every inspect does not create its own upstream call function
@@ -101,8 +107,8 @@ class GatewayService:
     chat_response.response=res.json()
     return chat_response
 
-  from ipaddress import ip_address
-from urllib.parse import urlparse
+# from ipaddress import ip_address
+# from urllib.parse import urlparse
 
 
 # below is the basic llm url protection that must be applied for v2

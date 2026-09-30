@@ -18,7 +18,7 @@ from app.modules.key.schemas import (
   PageResponse,
   GenerateResponse,
   GenerateSchema,
-  UpstreamConfig,
+  UpdateSchema,
   ConfigInternalResponse
 )
 
@@ -69,6 +69,9 @@ class KeyService:
     if key.user_id != user_id:
       raise UnauthorizedUserError()
 
+    if not key.is_active:
+       return None
+
     try:
       await repo.deactivate(key)  
       await db.commit()
@@ -85,8 +88,8 @@ class KeyService:
     pages=math.ceil(total/size)
     return PageResponse(
       items=[KeySchema.model_validate(key) for key in keys],
-      pages=pages,
-      total=total,
+      pages=pages,#total pages to contain all keys under this size
+      total=total,#no of keys
       page=page,
       size=size
     )
@@ -131,7 +134,7 @@ class KeyService:
   async def update(
     key_id:int,
     user_id:int,
-    data:UpstreamConfig,
+    data:UpdateSchema,
     db:AsyncSession
     )->KeySchema:
     """update the fields of row"""
@@ -148,6 +151,8 @@ class KeyService:
       key.llm_auth=encrypt_field(data.llm_auth)
       key.llm_url=data.llm_url
       key.llm_name=data.llm_name
+      if data.name is not None:
+        key.name=data.name
       await db.commit()
       await db.refresh(key)
     except Exception:

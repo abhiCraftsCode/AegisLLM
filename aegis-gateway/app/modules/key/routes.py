@@ -10,7 +10,7 @@ from app.modules.key.schemas import (
   GenerateSchema,
   KeySchema,
   PageResponse,
-  UpstreamConfig
+  UpdateSchema
 )
 
 key_router=APIRouter(prefix="/api-keys",tags=["API Keys"])
@@ -22,7 +22,7 @@ key_router=APIRouter(prefix="/api-keys",tags=["API Keys"])
     )
 async def update_key(
   key_id:int,
-  data:UpstreamConfig,
+  data:UpdateSchema,
   user:ProfileSchema=Depends(get_current_user),
   db:AsyncSession=Depends(get_db)
   ):
@@ -49,8 +49,8 @@ async def deactivate(
 
 @key_router.get("/all",response_model=PageResponse,status_code=status.HTTP_200_OK)
 async def get_all_keys(
-  page:int=Query(default=1,ge=1),
-  size:int=Query(default=20,ge=1,le=100),
+  page:int=Query(default=1,ge=1),#page no wanted
+  size:int=Query(default=20,ge=1,le=100),# size of each page
   user:ProfileSchema=Depends(get_current_user),
   db:AsyncSession=Depends(get_db)
   ):
