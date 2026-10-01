@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+@layer base {
+  body {
+    @apply bg-aegis-bg text-aegis-text antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  html.light body {
+    @apply bg-[#f5f7fb] text-[#1a2033];
+  }
+
+  ::selection {
+    background: rgba(79, 216, 224, 0.25);
+  }
+
+  * {
+    @apply border-aegis-border;
+  }
+
+  :focus-visible {
+    outline: 2px solid #4fd8e0;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer utilities {
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(148, 163, 184, 0.08) 25%,
+      rgba(148, 163, 184, 0.16) 37%,
+      rgba(148, 163, 184, 0.08) 63%
+    );
+    background-size: 400px 100%;
+    @apply animate-shimmer;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
