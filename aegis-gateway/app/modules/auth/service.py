@@ -7,14 +7,8 @@ from app.modules.auth.schemas import (
   LoginSchema,
   ForgotSchema,
   ResetSchema,
-<<<<<<< HEAD
   )
 from app.core.oauth import get_oauth_user,OauthLoginSchema
-=======
-  OauthLogin
-  )
-from app.core.oauth import get_oauth_user
->>>>>>> 17d9fee965e0c36de9e1f1f3c0e0f3435298c0a1
 from app.modules.user.schemas import ProfileSchema,UpdateSchema
 from app.core.exceptions import (
   MissingCredentialsError,
@@ -68,21 +62,14 @@ class AuthService:
       raise
 
   @staticmethod
-<<<<<<< HEAD
   async def oauth(payload:OauthLoginSchema,db:AsyncSession)->AuthResponse:
-=======
-  async def oauth(payload:OauthLogin,db:AsyncSession)->AuthResponse:
->>>>>>> 17d9fee965e0c36de9e1f1f3c0e0f3435298c0a1
     profile=await get_oauth_user(payload.provider,payload.code)
     user=await UserService.get_user(profile.email,db)
     if user:
       #existing user 
       if user.oauth_provider is None:
         # first time oauth of existing
-<<<<<<< HEAD
         # need to make oauth mulitvalued/ seperate table for multiple oauth service
-=======
->>>>>>> 17d9fee965e0c36de9e1f1f3c0e0f3435298c0a1
         user=await UserService.update(
             data=UpdateSchema(
             oauth_provider=profile.oauth_provider,
@@ -91,18 +78,12 @@ class AuthService:
           id=user.id,
           db=db)
     else:
-<<<<<<< HEAD
       name = profile.name
       if not name or not name.strip():
           name = profile.email.split("@")[0]
       new_user=User(
         email=profile.email,
         name=name,#safety measure
-=======
-      new_user=User(
-        email=profile.email,
-        name=profile.name,
->>>>>>> 17d9fee965e0c36de9e1f1f3c0e0f3435298c0a1
         password_hash=None,
         phone=None,
         oauth_provider=profile.oauth_provider,

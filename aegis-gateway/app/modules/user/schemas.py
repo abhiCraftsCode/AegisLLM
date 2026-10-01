@@ -42,13 +42,8 @@ class UpdateSchema(BaseModel):
   name:str|None=Field(default=None,min_length=2,max_length=100)
   email:EmailStr|None=None
   phone:str|None=Field(default=None,max_length=15,min_length=10)
-<<<<<<< HEAD
   oauth_provider:str|None=None #seperate the oauth update with regular update
   oauth_id:str|None=None #need to make oauth multi valued
-=======
-  oauth_provider:str|None=None
-  oauth_id:str|None=None
->>>>>>> 17d9fee965e0c36de9e1f1f3c0e0f3435298c0a1
   @field_validator("phone",mode="before")
   @classmethod
   def validate_phone(cls, value):
