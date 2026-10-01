@@ -5,7 +5,8 @@ from app.modules.gateway.schemas import (
   InspectRequest,
   InspectResponse,
   ChatCompletionResponse,
-  ChatCompletionRequest
+  ChatCompletionRequest,
+  OpenAIChatCompletionResponse
 )
 from app.modules.key.schemas import KeySchema
 from app.api.deps import get_current_api_key,get_engine,get_db
@@ -13,6 +14,7 @@ from app.core.engine import SecurityEngine
 from app.modules.gateway.service import GatewayService
 
 gateway_router=APIRouter(prefix="/chat",tags=["Gateway"])
+openai_router=APIRouter(prefix="/openai",tags=["OpenAi-compatible"])
 
 @gateway_router.post("/inspect",response_model=InspectResponse,status_code=status.HTTP_200_OK)
 async def inspect(
@@ -36,3 +38,17 @@ async def chat_completion(
   db:AsyncSession=Depends(get_db)
 ):
   return await GatewayService.chat_completion(data,key,eng,db)
+
+@openai_router.post(
+  "/chat/completions",
+  response_model=OpenAIChatCompletionResponse,
+  status_code=status.HTTP_200_OK
+  )
+async def create_chat_completion(
+  data:ChatCompletionRequest,
+  key:KeySchema=Depends(get_current_api_key),
+  eng:SecurityEngine=Depends(get_engine),
+  db:AsyncSession=Depends(get_db)
+):
+  return await GatewayService.create_chat(data,key,eng,db)
+

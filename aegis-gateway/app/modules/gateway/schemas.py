@@ -1,4 +1,5 @@
 from uuid import UUID
+from typing import Any
 from pydantic import Field,BaseModel,ConfigDict
 
 class Message(BaseModel):
@@ -28,3 +29,16 @@ class ChatCompletionRequest(BaseModel):
 class ChatCompletionResponse(InspectResponse):
     """response schema for inpect and upstream"""
     response:dict|None=None
+
+class OpenAIChoice(BaseModel):
+    index: int
+    message: Message
+    finish_reason: str
+
+class OpenAIChatCompletionResponse(BaseModel):
+    id: str
+    object: str = "chat.completion"
+    created: int
+    model: str
+    choices: list[OpenAIChoice]
+    aegis: InspectResponse

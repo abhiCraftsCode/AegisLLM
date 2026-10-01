@@ -1,4 +1,5 @@
 import httpx
+import time
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +10,10 @@ from app.models import AuditLog
 from app.modules.gateway.schemas import (
   InspectResponse,
   ChatCompletionRequest,
-  ChatCompletionResponse
+  ChatCompletionResponse,
+  OpenAIChatCompletionResponse,
+  OpenAIChoice,
+  Message
 )
 from app.modules.key.schemas import KeySchema
 from app.core.security import decrypt_field,encrypt_field
@@ -17,6 +21,66 @@ from app.core.exceptions import UpstreamLLMError,InvalidCredentialsError
 
 class GatewayService:
   """services related to the proxy gateway"""
+  @staticmethod
+  async def create_chat(
+    data:ChatCompletionRequest,
+    key:KeySchema,
+    eng:SecurityEngine,
+    db:AsyncSession
+  )->OpenAIChatCompletionResponse:
+    """open-ai compatible response generator cum chat completion"""
+    result=ChatCompletionResponse.model_validate(GatewayService.chat_completion(data,key,eng,db))
+    aegis=InspectResponse.model_validate(result)
+    if result.is_blocked or result.response is None:
+      return OpenAIChatCompletionResponse(
+        id=f"aegis-{result.request_id}",
+        created=int(time.time()),
+        model=data.model,
+        choices=[],
+        aegis=aegis
+      )
+    return OpenAIChatCompletionResponse(
+      id=f"aegis-{result.request_id}",
+      created=int(time.time()),
+      model=data.model,
+      choices=[
+        OpenAIChoice(
+          index=0,
+          message=Message(
+            role="assistant",
+            content=GatewayService._extract_content(result.response)
+          ),
+          finish_reason="STOP"
+        )
+      ],
+      aegis=aegis
+    )
+
+  @staticmethod
+  def _extract_content(
+        response: dict | None,
+    ) -> str:
+    if not response:
+        return ""
+    choices = response.get("choices")
+    if isinstance(choices, list) and choices:
+        message = choices[0].get("message")
+        if isinstance(message, dict):
+            content = message.get("content")
+            if isinstance(content, str):
+                return content
+    message = response.get("message")
+    if isinstance(message, dict):
+        content = message.get("content")
+        if isinstance(content, str):
+            return content
+    content = response.get("content")
+    if isinstance(content, str):
+        return content
+    output = response.get("output")
+    if isinstance(output, str):
+        return output
+    return str(response)
 
   @staticmethod
   async def inspect(
