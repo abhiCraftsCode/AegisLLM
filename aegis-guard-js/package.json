@@ -1,0 +1,18 @@
+{
+  "name": "aegis-guard",
+  "version": "0.1.0",
+  "description": "Node.js SDK for AegisLLM",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
