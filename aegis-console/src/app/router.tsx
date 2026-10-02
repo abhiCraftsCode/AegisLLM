@@ -10,6 +10,7 @@ import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import OAuthCallbackPage from "@/pages/OAuthCallbackPage";
 import DashboardPage from "@/pages/DashboardPage";
 import ApiKeysPage from "@/pages/ApiKeysPage";
+import IntegrationsPage from "@/pages/IntegrationsPage";
 import InspectorPage from "@/pages/InspectorPage";
 import AuditLogsPage from "@/pages/AuditLogsPage";
 import ProfilePage from "@/pages/ProfilePage";
@@ -54,6 +55,7 @@ export function AppRouter() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="inspector" element={<InspectorPage />} />
         <Route path="api-keys" element={<ApiKeysPage />} />
+        <Route path="integrations" element={<IntegrationsPage />} />
         <Route path="audit-logs" element={<AuditLogsPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />

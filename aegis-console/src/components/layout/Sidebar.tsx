@@ -10,6 +10,7 @@ import {
   LogOut,
   ChevronsLeft,
   ChevronsRight,
+  Plug,
 } from "lucide-react";
 import { Logo } from "@/components/common/Logo";
 import { useAuth } from "@/hooks/useAuth";
@@ -27,7 +28,12 @@ interface NavGroup {
 }
 
 const groups: NavGroup[] = [
-  { label: "Overview", items: [{ to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard }] },
+  {
+    label: "Overview",
+    items: [
+      { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    ],
+  },
   {
     label: "Security",
     items: [
@@ -35,7 +41,13 @@ const groups: NavGroup[] = [
       { to: "/app/audit-logs", label: "Audit Logs", icon: ScrollText },
     ],
   },
-  { label: "Developer", items: [{ to: "/app/api-keys", label: "API Keys", icon: KeyRound }] },
+  {
+    label: "Developer",
+    items: [
+      { to: "/app/api-keys", label: "API Keys", icon: KeyRound },
+      { to: "/app/integrations", label: "Integrations", icon: Plug },
+    ],
+  },
   {
     label: "Account",
     items: [
@@ -58,10 +70,23 @@ export function Sidebar({
 
   return (
     <div className="flex h-full flex-col bg-aegis-surface/60">
-      <div className={cn("flex h-16 items-center border-b border-aegis-border px-4", collapsed && "justify-center px-0")}>
-        <NavLink to="/app/dashboard" className="flex items-center gap-2.5" onClick={onNavigate}>
+      <div
+        className={cn(
+          "flex h-16 items-center border-b border-aegis-border px-4",
+          collapsed && "justify-center px-0",
+        )}
+      >
+        <NavLink
+          to="/app/dashboard"
+          className="flex items-center gap-2.5"
+          onClick={onNavigate}
+        >
           <Logo size={26} />
-          {!collapsed && <span className="text-sm font-semibold tracking-tight text-aegis-text">AegisLLM</span>}
+          {!collapsed && (
+            <span className="text-sm font-semibold tracking-tight text-aegis-text">
+              AegisLLM
+            </span>
+          )}
         </NavLink>
       </div>
 
@@ -86,7 +111,7 @@ export function Sidebar({
                       collapsed && "justify-center",
                       isActive
                         ? "bg-aegis-cyanSoft text-aegis-cyan"
-                        : "text-aegis-textMuted hover:bg-white/5 hover:text-aegis-text"
+                        : "text-aegis-textMuted hover:bg-white/5 hover:text-aegis-text",
                     )
                   }
                 >
@@ -105,7 +130,7 @@ export function Sidebar({
           title={collapsed ? "Logout" : undefined}
           className={cn(
             "flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-aegis-textMuted transition-colors hover:bg-aegis-coral/10 hover:text-aegis-coral",
-            collapsed && "justify-center"
+            collapsed && "justify-center",
           )}
         >
           <LogOut size={17} />
@@ -116,11 +141,15 @@ export function Sidebar({
             onClick={onToggleCollapse}
             className={cn(
               "mt-1 hidden w-full items-center gap-3 rounded-lg px-2.5 py-2 text-sm text-aegis-textFaint transition-colors hover:bg-white/5 hover:text-aegis-text lg:flex",
-              collapsed && "justify-center"
+              collapsed && "justify-center",
             )}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {collapsed ? <ChevronsRight size={17} /> : <ChevronsLeft size={17} />}
+            {collapsed ? (
+              <ChevronsRight size={17} />
+            ) : (
+              <ChevronsLeft size={17} />
+            )}
             {!collapsed && <span>Collapse</span>}
           </button>
         )}
