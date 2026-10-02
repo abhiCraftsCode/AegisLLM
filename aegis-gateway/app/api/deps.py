@@ -10,7 +10,7 @@ from app.modules.key.service import KeyService
 from app.modules.user.schemas import ProfileSchema
 from app.modules.key.schemas import KeySchema
 from app.db import LocalSession
-from app.core.engine import SecurityEngine,AegisEngine
+from app.core.engine import SecurityEngine
 from app.core.exceptions import (
     MissingTokenError,
     AccessTokenError,
@@ -21,7 +21,7 @@ bearer_scheme = HTTPBearer()
 
 """dependencies should be returning objects of db or orm instead of schema considered best practice"""
 #making static copy of engine
-#__engine_instance=AegisEngine()
+#__engine_instance=AegisEngine()#cross check i think it is already static and global
 
 #dependency helper function to connect to db
 async def get_db()->AsyncGenerator[AsyncSession,None]:
@@ -36,7 +36,7 @@ async def get_db()->AsyncGenerator[AsyncSession,None]:
 def get_engine(req:Request)->SecurityEngine:
     """dependency for engine prerequisite loading"""
     #return __engine_instance
-    return req.app.state.engine
+    return req.app.state.engine#global engine from server stored states
 
 # dependency function to mimic isAuth for jwt
 async def get_current_user(

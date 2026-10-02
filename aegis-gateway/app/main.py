@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.engine import AegisEngine
 from app.core.exceptions import AppException,exception_handler
-from app.db import engine, Base
+from app.db import db_engine, Base
 from app.api.router import api_router
 
 # Lifespan context manager to auto-create DB tables on server startup
@@ -13,12 +13,12 @@ from app.api.router import api_router
 async def lifespan(app: FastAPI):
     print("[INFO] Aegis Gateway starting up...")
     app.state.engine=AegisEngine() # one engine for whole lifespan
-    async with engine.begin() as conn:
+    async with db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
     print("[INFO] Aegis Gateway shutting down...")
     del app.state.engine
-    await engine.dispose()
+    await db_engine.dispose()
 
 # main app
 app = FastAPI(

@@ -13,6 +13,7 @@ class Settings(BaseSettings):
   ACCESS_TOKEN_EXPIRE_MINUTES: int = 360
   REFRESH_TOKEN_EXPIRE_DAYS: int = 2
   RESET_TOKEN_EXPIRE_MINUTES:int = 15
+  LOCAL_MODEL_PATH:str|None=None
 
   # OAuth fields  
   GOOGLE_TOKEN_URL:ClassVar[str] = "https://oauth2.googleapis.com/token"
@@ -43,7 +44,8 @@ class Settings(BaseSettings):
 
   # mandatories
   DATABASE_URL:str=Field(...)
-  MODEL_PATH:str=Field(...)
+  HF_REPO_ID:str=Field(...)
+  HF_MODEL_NAME:str=Field(...)
   SECRET_KEY:str=Field(...)
   ENCRYPTION_KEY:str=Field(...)
   GATEWAY_KEY:str=Field(...)

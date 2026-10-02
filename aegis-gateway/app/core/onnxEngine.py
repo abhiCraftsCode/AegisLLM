@@ -2,20 +2,30 @@ import os
 import numpy as np
 import onnxruntime as ort
 from transformers import AutoTokenizer
+from huggingface_hub import hf_hub_download
 
 from app.core.config import settings
-from app.core.exceptions import ModelNotFoundError
 
 
 class ONNXEngine:
   """tier 2 onnx serach engine"""
   def __init__(self):
     """intializes the engine's tokenizer and session"""
-    model_path = settings.MODEL_PATH
+    model_path = settings.LOCAL_MODEL_PATH
     # check for model presence
-    if not os.path.exists(model_path):
-      raise ModelNotFoundError()
-
+    if model_path is not None and os.path.exists(model_path):
+      #model present locally
+      print(f"[ONNXEngine] Using local model path: {model_path}")
+    else:
+      #model not present locally downloadig from hugging face
+      repo_id=settings.HF_REPO_ID
+      print(f"[ONNXEngine] Resolving model from Hugging Face Hub: {repo_id}")
+      model_path=hf_hub_download(
+        repo_id=repo_id,
+        filename=settings.HF_MODEL_NAME
+      )
+      print(f"[ONNXEngine] Model resolved at cache path: {model_path}")
+    
     self.tokenizer = AutoTokenizer.from_pretrained(
       "microsoft/deberta-v3-small"
     )
