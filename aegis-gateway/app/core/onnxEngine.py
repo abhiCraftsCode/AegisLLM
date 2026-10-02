@@ -25,6 +25,8 @@ class ONNXEngine:
         filename=settings.HF_MODEL_NAME
       )
       print(f"[ONNXEngine] Model resolved at cache path: {model_path}")
+    #or we can direclty fetch from huggingface removing the local model check/dependency
+    #alwayse create my own local model
     
     self.tokenizer = AutoTokenizer.from_pretrained(
       "microsoft/deberta-v3-small"
