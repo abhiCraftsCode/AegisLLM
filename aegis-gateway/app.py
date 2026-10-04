@@ -7,7 +7,7 @@ with gr.Blocks(title="Aegis Gateway") as demo:
     gr.Markdown("FastAPI gateway is active.")
     gr.Markdown("- **Interactive Swagger Docs:** Access [`/docs`](/docs)")
 
-# Mount Gradio onto your existing FastAPI application at /status
+# Mount Gradio at the root onto your existing FastAPI application preserving all the endpoints
 # This leaves all your FastAPI routes (such as /docs and /v1/...) running untouched
 app = gr.mount_gradio_app(fastapi_app, demo, path="/")
 
