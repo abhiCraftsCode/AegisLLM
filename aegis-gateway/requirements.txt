@@ -1,38 +1,37 @@
 # Web Framework & Server
-fastapi==0.141.1
-uvicorn[standard]==0.53.0
-gradio>=4.20.0
+fastapi>=0.141,<1.0
+uvicorn[standard]>=0.53,<1.0
 
 # Configuration & Data Validation
-pydantic==2.13.5
-pydantic-settings==2.15.0
-python-dotenv==1.2.3
-pydantic-core==2.46.5
+pydantic>=2.11,<2.13
+pydantic-settings>=2.10,<3.0
+python-dotenv>=1.2,<2.0
+pydantic-core>=2.30,<3.0
 
-# Database & ORM (Neon Postgres over asyncpg)
-sqlalchemy==2.0.54
-asyncpg==0.31.0
+# Database & ORM
+sqlalchemy>=2.0,<3.0
+asyncpg>=0.31,<1.0
 
 # HTTP Client & Security
-httpx==0.28.1
-requests==2.34.2
-python-jose[cryptography]==3.5.0
-cryptography==50.0.1
-pwdlib[argon2]==0.3.1
+httpx>=0.28,<1.0
+requests>=2.34,<3.0
+python-jose[cryptography]>=3.5,<4.0
+cryptography>=45,<51
+pwdlib[argon2]>=0.3,<1.0
 
 # Email & rate limits
-fastapi-mail==1.6.8
-slowapi==0.1.10
-limits==5.8.0
+fastapi-mail>=1.6,<2.0
+slowapi>=0.1,<1.0
+limits>=5.8,<6.0
 
-# AI Inference & Hugging Face Hub
-numpy==2.2.6
-onnx==1.23.0
-onnx-ir==1.0.0
-onnxruntime==1.23.2
-onnxscript==0.7.2
-huggingface-hub==1.32.0
-transformers==5.17.0
-tiktoken==0.14.0
-tokenizers==0.23.2
-sentencepiece==0.2.2
+# AI Inference & Hugging Face
+numpy>=2.0,<2.3
+onnx>=1.20,<1.24
+onnx-ir>=1.0,<2.0
+onnxruntime>=1.23,<1.24
+onnxscript>=0.7,<1.0
+huggingface-hub>=1.30,<2.0
+transformers>=5.17,<6.0
+tiktoken>=0.14,<1.0
+tokenizers>=0.23,<0.24
+sentencepiece>=0.2,<1.0
