@@ -2,29 +2,34 @@
 fastapi==0.141.1
 uvicorn[standard]==0.53.0
 gradio>=4.20.0
+
 # Configuration & Data Validation
 pydantic==2.13.5
 pydantic-settings==2.15.0
 python-dotenv==1.2.3
 pydantic-core==2.46.5
+
 # Database & ORM (Neon Postgres over asyncpg)
 sqlalchemy==2.0.54
 asyncpg==0.31.0
+
 # HTTP Client & Security
 httpx==0.28.1
 requests==2.34.2
 python-jose[cryptography]==3.5.0
 cryptography==50.0.1
 pwdlib[argon2]==0.3.1
+
 # Email & rate limits
 fastapi-mail==1.6.8
 slowapi==0.1.10
 limits==5.8.0
-# AI Inference & Hugging Face Hub (PyTorch-free)
+
+# AI Inference & Hugging Face Hub
 numpy==2.2.6
 onnx==1.23.0
 onnx-ir==1.0.0
-onnxruntime==1.30.0
+onnxruntime==1.23.2
 onnxscript==0.7.2
 huggingface-hub==1.32.0
 transformers==5.17.0
