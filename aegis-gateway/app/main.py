@@ -13,8 +13,10 @@ from app.api.router import api_router
 async def lifespan(app: FastAPI):
     print("[INFO] Aegis Gateway starting up...")
     app.state.engine=AegisEngine() # one engine for whole lifespan
+    print("[DB] connecting and creating tables on db")
     async with db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    print("[DB] connected and created tables on db successfully.")
     yield
     print("[INFO] Aegis Gateway shutting down...")
     del app.state.engine
