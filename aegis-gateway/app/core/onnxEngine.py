@@ -31,11 +31,12 @@ class ONNXEngine:
     self.tokenizer = AutoTokenizer.from_pretrained(
       "microsoft/deberta-v3-small"
     )
-
+    print(f"[ONNXEngine] creating session for engine.")
     self.session = ort.InferenceSession(
       model_path,
       providers=["CPUExecutionProvider"],
     )
+    print(f"[ONNXEngine] successfully created session for engine.")
 
   def predict(self, prompt: str) -> tuple[bool, float]:
     """prompt scoring for inspection"""
