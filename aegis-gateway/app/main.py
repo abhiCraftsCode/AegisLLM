@@ -13,7 +13,7 @@ from app.api.router import api_router
 async def lifespan(app: FastAPI):
     print("[INFO] Aegis Gateway starting up...")
     app.state.engine=AegisEngine() # one engine for whole lifespan
-    print("[DB] connecting and creating tables on db")
+    print("[DB] testing sql connections...")
     try:
       async with await asyncio.wait_for(
         db_engine.connect(),
@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
         print("[DB] database connection/query failed:", repr(e))
         raise
 
-    print("[DB] connected and created tables on db successfully.")
+    print("[DB] connection tested on db successfully.")
     yield
     print("[INFO] Aegis Gateway shutting down...")
     del app.state.engine
