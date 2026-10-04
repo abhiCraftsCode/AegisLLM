@@ -15,6 +15,7 @@ async def lifespan(app: FastAPI):
     app.state.engine=AegisEngine() # one engine for whole lifespan
     print("[DB] connecting and creating tables on db")
     async with db_engine.begin() as conn:
+        print("[DB] db connection established.")
         await conn.run_sync(Base.metadata.create_all)
     print("[DB] connected and created tables on db successfully.")
     yield
