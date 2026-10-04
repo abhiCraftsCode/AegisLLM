@@ -21,7 +21,7 @@ fastapi-mail==1.6.8
 slowapi==0.1.10
 limits==5.8.0
 # AI Inference & Hugging Face Hub (PyTorch-free)
-numpy==2.5.3
+numpy==2.2.6
 onnx==1.23.0
 onnx-ir==1.0.0
 onnxruntime==1.30.0
