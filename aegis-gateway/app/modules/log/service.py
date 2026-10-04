@@ -23,7 +23,7 @@ class LogService:
     return LogSchema.model_validate(log)
 
   @staticmethod
-  async def get_all_logs(user_id:int,page:int,size:int,db:AsyncSession)->PageResponse[LogSchema]:
+  async def get_all_logs(user_id:int,page:int,size:int,db:AsyncSession)->PageResponse:
     """fetch all the logs of user"""
     """pagination result fromation"""
     repo=LogRepository(db)

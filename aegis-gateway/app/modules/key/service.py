@@ -81,7 +81,7 @@ class KeyService:
     #return none because success deletion code will be returned 
 
   @staticmethod
-  async def get_all_keys(user_id:int,page:int,size:int,db:AsyncSession)->PageResponse[KeySchema]:
+  async def get_all_keys(user_id:int,page:int,size:int,db:AsyncSession)->PageResponse:
     """fetch all the keys of user"""
     repo=KeyRepository(db)
     keys,total=await repo.get_all_for_user(user_id,page,size)
