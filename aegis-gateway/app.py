@@ -11,6 +11,6 @@ with gr.Blocks(title="Aegis Gateway") as demo:
 # This leaves all your FastAPI routes (such as /docs and /v1/...) running untouched
 app = gr.mount_gradio_app(fastapi_app, demo, path="/")
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+# if __name__ == "__main__":
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=7860)
