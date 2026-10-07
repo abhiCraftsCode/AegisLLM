@@ -9,7 +9,7 @@ with gr.Blocks(title="Aegis Gateway") as demo:
 
 # Mount Gradio at the root onto your existing FastAPI application preserving all the endpoints
 # This leaves all your FastAPI routes (such as /docs and /v1/...) running untouched
-app = gr.mount_gradio_app(fastapi_app, demo, path="/")
+app = gr.mount_gradio_app(fastapi_app, demo, path="/",ssr_mode=False)
 
 if __name__ == "__main__":
     import uvicorn
